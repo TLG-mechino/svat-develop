@@ -1,0 +1,167 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}Liên hệ{% endblock title %}
+{% block css %}
+{% comment %}<link rel="stylesheet" href="{% static 'user/user-page/css/styles.css' %}">{% endcomment %}
+<style>
+
+h4 {
+    font-size: 24px;
+}
+
+button {
+    font-style: normal;
+    font-variant-ligatures: normal;
+    font-variant-caps: normal;
+    font-variant-numeric: normal;
+    font-variant-east-asian: normal;
+    font-weight: 400;
+    font-stretch: normal;
+    font-size: 13.3333px;
+    line-height: normal;
+    font-family: Arial;
+}
+.icon_contact{
+    font-size: 36px;
+    color: #7fad39;
+}
+</style>
+{% endblock css %}
+
+{% block content %}
+<!-- Site wrapper -->
+{% csrf_token %}
+
+<section class="breadcrumb-section set-bg" data-setbg="/static/user/global/images/bg-breadcrumb.png" style="background-image: url(&quot;/static/user/global/images/bg-breadcrumb.png&quot;);">
+  <div class="container h-100">
+    <div class="text-center h-100">
+      <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+        <h2>{% trans 'user-contact' %}</h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact spad">
+  <div class="container">
+
+    <div class="row">
+
+      <div class="col-lg-3 col-md-3 col-sm-6 text-center">
+        <div class="contact__widget">
+          <i  class="fas fa-phone-alt icon_contact"></i>
+          <h4>{% trans 'user-contact-phone' %}</h4>
+          <p>0246.2601.144</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-6 text-center">
+        <div class="contact__widget">
+          <i  class="fas fa-map-marker-alt icon_contact"></i>
+          <h4>{% trans 'user-contact-address' %}</h4>
+          <p>Tây Đằng Ba Vì Hà Nội </p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-6 text-center">
+        <div class="contact__widget">
+          <i class="far fa-clock icon_contact"></i>
+          <h4>{% trans 'user-contact-open' %}</h4>
+          <p>08:00 đến 23:00</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-6 text-center">
+        <div class="contact__widget">
+          <i class="far fa-envelope icon_contact"></i>
+          <h4>Email</h4>
+          <p>Duckhuong2010@gmail.com</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d59514.58824902038!2d105.39156608573367!3d21.205591291003877!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134f4db4d96084b%3A0x5527d4f8fc1903b5!2zVMOieSDEkOG6sW5nLCBCYSBWw6wsIEjDoCBO4buZaQ!5e0!3m2!1svi!2s!4v1623421998375!5m2!1svi!2s" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+</section>
+
+<div class="contact-form spad">
+  <h3 class="text-center text-dark font-weight-bold ">{% trans 'user-contact-mess' %}</h3>
+  <div class="container-fluid w-80 bg-white p-4">
+    <form>
+      <div class="row">
+        <div class="col-lg-6 col-md-6">
+          <input id="contact-name" type="text" placeholder="{% trans 'user-contact-name' %}">
+        </div>
+        <div class="col-lg-6 col-md-6">
+          <input id="contact-email" type="email" placeholder="Email">
+        </div>
+        <div class="col-lg-12 text-center">
+          <textarea id="contact-content" placeholder="{% trans 'user-contact-content' %}"></textarea>
+        </div>
+      </div>
+    </form>
+    <button id="send_message"  class="site-btn">{% trans 'user-contact-send' %}</button>
+
+  </div>
+</div>
+
+{% endblock content %}
+{% block script %}
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    function isValidMess(){
+      if($('#contact-name').val() === '') return [false, "Họ tên không được để trống"]
+      if( $('#contact-email').val() === '') return [false, "Email không được để trống"]
+      if( $('#contact-content').val() === '') return [false, "Nội dung không được để trống"]
+      return [true, ""] 
+    }
+
+    $('#send_message').on('click', function() {
+
+      let [isValid, msg] = isValidMess()
+      if(isValid){
+        let data={
+          "name":$('#contact-name').val(),
+          "email":$('#contact-email').val(),
+          "message": $("#contact-content").val(),
+        }
+        let url = `/${window.location.pathname.split('/')[1]}/send_message`;
+
+        $.ajax({
+          url,
+          type: 'POST',
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(
+            data
+          ),
+        }).then(data => {
+          if (!data.success) {
+            toastr.error("Có lôi xảy ra")
+
+          } else {
+            toastr.success("Gửi phản hồi thành công")
+            document.getElementById('contact-name').value = "";
+            document.getElementById('contact-email').value = "";
+            document.getElementById("contact-content").value = "";
+          }
+        })
+      }
+      else{
+        toastr.warning(msg)
+      }
+    })
+
+  })
+</script>
+{% endblock script %}
+

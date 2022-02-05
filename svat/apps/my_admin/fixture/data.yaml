@@ -1,0 +1,68 @@
+# User
+- model: my_admin.User
+  fields:
+    email: user@svat.com
+    username: user@svat.com
+    password: pbkdf2_sha256$260000$lCeDIRIrvuoxMw64whsvlV$LgKo8ErISUj6dvZbSa0qAQpMvAvwRaqo93oE5vcWjDQ=
+    name: user
+    is_verify: 1
+    role: 1
+
+- model: my_admin.User
+  fields:
+    email: admin@svat.com
+    username: admin@svat.com
+    password: pbkdf2_sha256$260000$lCeDIRIrvuoxMw64whsvlV$LgKo8ErISUj6dvZbSa0qAQpMvAvwRaqo93oE5vcWjDQ=
+    name: admin
+    is_verify: 1
+    is_superuser: 1
+    is_staff: 1
+    role: 10
+    
+
+- model: my_admin.User
+  fields:
+    email: admin_lvl2@svat.com
+    username: admin_lvl2@svat.com
+    password: pbkdf2_sha256$260000$lCeDIRIrvuoxMw64whsvlV$LgKo8ErISUj6dvZbSa0qAQpMvAvwRaqo93oE5vcWjDQ=
+    name: admin_2
+    is_verify: 1
+    is_superuser: 1
+    is_staff: 1
+    role: 11
+    
+
+- model: my_admin.User
+  fields:
+    email: admin_lvl3@svat.com
+    username: admin_lvl3@svat.com
+    password: pbkdf2_sha256$260000$lCeDIRIrvuoxMw64whsvlV$LgKo8ErISUj6dvZbSa0qAQpMvAvwRaqo93oE5vcWjDQ=
+    name: admin_3
+    is_verify: 1
+    is_superuser: 1
+    is_staff: 1
+    role: 12
+
+# Product Category
+- model: my_admin.ProductCategory
+  fields:
+    name_en: Herbicide
+    name_vi: Thuốc trừ cỏ
+
+- model: my_admin.ProductCategory
+  fields:
+    name_en: Pesticides
+    name_vi: Thuốc trừ sâu
+
+
+# Language
+- model: my_admin.Language
+  fields:
+    name: Vietnamese
+    code: vi
+
+- model: my_admin.Language
+  fields:
+    name: English
+    code: en 
+

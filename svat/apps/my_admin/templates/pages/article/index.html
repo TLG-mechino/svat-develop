@@ -1,0 +1,178 @@
+{% extends 'layout/base.html' %} {% load i18n %} {% block content %}
+{% load static %}
+{% load tz %}
+<style>
+.action-group-btn {
+  width: 9rem;
+}
+td:nth-of-type(2) {
+  white-space: nowrap;
+}
+td:nth-of-type(3) {
+  width: 11%;
+  white-space: nowrap;
+  text-align: right;
+  text-align: center;
+}
+td:nth-of-type(4) {
+  width: 7rem;
+}
+
+/* table general */
+td:last-child {
+  white-space: nowrap;
+  width: 12%;
+}
+
+td:last-child button:first-child {
+  margin-right: 10px;
+}
+
+</style>
+
+<!-- Modal Delete User -->
+<div class="modal fade" id="deleteArticleModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserModalLabel">Xác nhận xóa</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" id="alertDeleteError" role="alert" style="display:none">
+          <span id="deleteErrorMsg"></span>
+        </div>
+        Bạn có chắc chắn muốn xóa bài viết <span id="deleteUserName" style="font-weight: bold;"></span>?
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" id="delete-id" value="">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+        <button type="button" class="btn btn-primary" id="confirmDelete" data-id="">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row p-2">
+    <div class="col"><h3>Quản lý bài viết</h3></div>
+    <div class="col"></div>
+  </div>
+  <div class="card card-primary card-outline">
+    <div class="card-header"></div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <a href="{% url 'admin.article.get.store' %}">
+      <button type="button" class="btn btn-primary btn-sm create-btn">Thêm mới</button>
+      </a>
+      <form>{% csrf_token %}</form>
+      <table id="main-table" class="table table-bordered table-hover table-fixed">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tiêu đề (VI)</th>
+            <th>Thời gian đăng</th>
+            <th>Luợt xem</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <!-- /.card-body -->
+  </div>
+</div>
+
+{% endblock content %} 
+{% block script %}
+
+
+<script>
+  function addLeadingZero(strDate){
+    return ('0' + strDate.toString()).slice(-2)
+  }
+
+  function formatDate(date, includedTime=false){
+      let dateStr = `${addLeadingZero(date.getUTCDate())}/${addLeadingZero(date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`
+      let timeStr = ''
+
+      if(includedTime === true){
+          timeStr = `${addLeadingZero((date.getUTCHours() + 7) % 24)}:${addLeadingZero(date.getUTCMinutes())}:${addLeadingZero(date.getUTCSeconds())}`
+      }
+      
+      return `${dateStr} ${timeStr}`
+  }
+
+  window.CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/';
+  var CKEDITOR_BASEPATH = '/Scripts/ckeditor/';
+  var articleTable = $("#main-table").DataTable({
+    serverSide: true,
+    ajax: {
+      url: '/en/admin/getArticles',
+      type: "GET"
+    },
+    pageLength: 20,
+    searchDelay: 500,
+    paging: true,
+    lengthChange: false,
+    searching: true,
+    ordering: true,
+    info: true,
+    autoWidth: false,
+    responsive: true,
+    columns: [
+        { "data": "id" },
+        { "data": "articlelanguage__title" },
+        { 
+            "data": "post_at",
+            "render": function (data, type, row, meta){
+              let date = new Date(data)
+              return formatDate(date, true)
+            }
+        },
+        { "data": "view" },
+        {
+          "data": "actions",
+          "render": function ( data, type, row, meta ) {
+              return `<button type="button" class="btn btn-primary edit-btn" data-id="${row.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16"> <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/> <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/> </svg></button>  <button type="button" data-id="${row.id}" class="btn btn-danger delete-btn"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16"> <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/></svg> </button>`
+            }
+        }
+    ]
+  });
+
+  $(document).on('click', '.edit-btn', function(){
+      let id = $(this).data('id')
+      let url = `{% url 'admin.article.get.edit' 123 %}`;
+      document.location.href = url.replace('123', id);
+  })
+
+  $(document).on('click', '.delete-btn', function(){
+    $('#delete-id').val($(this).data('id'));
+    $('#deleteArticleModal').modal('show');
+  })
+  
+  $('#confirmDelete').click(function(){
+    let url = `/${window.location.pathname.split('/')[1]}/admin/article/${$("#delete-id").val()}`;
+    $.ajax({
+        url,
+        type: "DELETE",
+        headers: {
+          "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+        },
+        dataType: 'json',
+        success: function(data) {
+          if (data.success) {
+            $(`#row-${data.data}`).remove();
+            toastr.success('Xóa bài viết thành công')
+            articleTable.ajax.reload()
+          } else {
+            toastr.error(data.message)
+          }
+          $('#deleteArticleModal').modal('hide');
+        }
+      })
+    })
+
+</script>
+{% endblock script %}

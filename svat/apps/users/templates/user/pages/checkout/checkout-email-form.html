@@ -1,0 +1,248 @@
+{% load i18n %}
+{% load humanize %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'>
+    <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <style type="text/css">
+        @media screen {
+            @font-face {
+                font-family: 'Lato';
+                font-style: normal;
+                font-weight: 400;
+                src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v11/qIIYRU-oROkIk8vfvxw6QvesZW2xOQ-xsNqO47m55DA.woff) format('woff');
+            }
+
+            @font-face {
+                font-family: 'Lato';
+                font-style: normal;
+                font-weight: 700;
+                src: local('Lato Bold'), local('Lato-Bold'), url(https://fonts.gstatic.com/s/lato/v11/qdgUG4U09HnJwhYI-uK18wLUuEpTyoUstqEm5AMlJo4.woff) format('woff');
+            }
+
+            @font-face {
+                font-family: 'Lato';
+                font-style: italic;
+                font-weight: 400;
+                src: local('Lato Italic'), local('Lato-Italic'), url(https://fonts.gstatic.com/s/lato/v11/RYyZNoeFgb0l7W3Vu1aSWOvvDin1pK8aKteLpeZ5c0A.woff) format('woff');
+            }
+
+            @font-face {
+                font-family: 'Lato';
+                font-style: italic;
+                font-weight: 700;
+                src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url(https://fonts.gstatic.com/s/lato/v11/HkF_qI1x_noxlxhrhMQYELO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
+            }
+        }
+
+        /* CLIENT-SPECIFIC STYLES */
+        body,
+        table,
+        td,
+        a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+
+        /* RESET STYLES */
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        table {
+            border-collapse: collapse !important;
+        }
+
+        body {
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        /* iOS BLUE LINKS */
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: none !important;
+            font-size: inherit !important;
+            font-family: inherit !important;
+            font-weight: inherit !important;
+            line-height: inherit !important;
+        }
+
+        /* MOBILE STYLES */
+        @media screen and (max-width:600px) {
+            h1 {
+                font-size: 32px !important;
+                line-height: 32px !important;
+            }
+        }
+
+        /* ANDROID CENTER FIX */
+        div[style*="margin: 16px 0;"] {
+            margin: 0 !important;
+        }
+    </style>
+</head>
+
+<body style="background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;">
+    <!-- HIDDEN PREHEADER TEXT -->
+    <div style="display: none; font-size: 1px; color: #fefefe; line-height: 1px; font-family: 'Lato', Helvetica, Arial, sans-serif; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden;">{% trans "verify-email-plain-00" %}</div>
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td bgcolor="#7fad39" align="center">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                    <tr>
+                        <td align="center" valign="top" style="padding: 40px 10px 40px 10px;"> </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <!-- header info -->
+        <tr>
+            <td bgcolor="#7fad39" align="center" style="padding: 0px 10px 0px 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                    <tr>
+                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 0px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 32px;">
+                            <h3 style="font-size: 28px; font-weight: 400;">THÔNG TIN ĐƠN HÀNG</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#ffffff" align="center" valign="top" style="padding: 0px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-weight: 400; ">
+                            <h3 style="font-size: 20px; font-weight: normal;">Dưới đây là thông tin đơn hàng <span style="font-weight: bold">#{{order.id}}</span> - {{order.created | date:"d/m/Y H:i:s"}}</h3>
+                            <h3  style="font-size: 20px; font-weight: normal;">Trạng thái đơn hàng</h3>
+                            <h2 style="font-size: 24px; color:#7fad39" >Đã xác nhận</h2>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Table san pham -->
+        <tr>
+            <td align="center" style="padding: 0px 10px 0px 10px;">
+                <table outline="0" bgcolor="#fff" cellpadding="0" cellspacing="0" width="100%" style="padding: 3px;width: 600px; border:1px solid #fff; table-layout: fixed">
+                    <thead style="width: 100%">
+                        <th align="left" style="width: 60%; padding: 10px; ">Tên sản phẩm</th>
+                        <th style="width: 10%">Số lượng</th>
+                        <th style="width: 20%">Đơn giá</th>
+                        <th style="width: 20%">Thành tiền</th>
+                    </thead>
+                    <tbody>
+                    {% for product in order.order_product %}
+                        <tr bgcolor="#e6e6e6">
+                            <td align="left" style="border: 2px solid #fff;padding:10px;font-family: 'Lato', Helvetica, Arial, sans-serif; ">
+                            {% if request.LANGUAGE_CODE == "vi" %}
+                              {{ product.product_model.product.product_language_vi.name }}
+                            {% else %} 
+                              {{ product.product_model.product.product_language_en.name }}
+                            {% endif %}
+                            </td>
+                            <td align="center" style="border: 2px solid #fff;padding:10px;font-family: 'Lato', Helvetica, Arial, sans-serif; ">{{product.quantity}}</td>
+                            <td align="center" style="border: 2px solid #fff;padding:10px;font-family: 'Lato', Helvetica, Arial, sans-serif; ">{{product.product_model.price | floatformat:0}}đ</td>
+                            <td align="center" style="border: 2px solid #fff;padding:10px;font-family: 'Lato', Helvetica, Arial, sans-serif; ">
+                            {% widthratio product.product_model.price 1 product.quantity as total_value %} 
+                            {{ total_value | floatformat:0 | intcomma }}đ
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr bgcolor="#e6e6e6">
+                        <td align="left" style="border: 1px solid #fff;padding: 10px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; ">
+                            Phí vận chuyển
+                        </td>
+                        <td colspan="3" align="right" style="border: 1px solid #fff;padding: 10px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; ">
+                            {{ order.shipping_fee | floatformat:0 | intcomma }}đ
+                        </td>	
+                    </tr>
+                    <tr bgcolor="#e6e6e6">
+                        <td align="left" style="border: 1px solid #fff;padding: 10px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; ">
+                            Tổng giá trị sản phẩm
+                        </td>
+                        <td colspan="3" align="right" style="border: 1px solid #fff;padding: 10px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; ">
+                            {{order.total_products}}đ
+                        </td>	
+                    </tr>
+                    <tr bgcolor="#e6e6e6">
+                        <td align="left" style="border: 1px solid #fff;padding: 10px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; ">
+                            Tổng giá thanh toán
+                        </td>
+                        <td colspan="3" align="right" style="font-weight: bold;border: 1px solid #fff;padding: 10px; border-radius: 0px 0px 4px 4px; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px;">
+                            {{order.total}}đ
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Shipping info -->
+        <tr>
+            <td bgcolor="#f4f4f4" align="center" style="padding: 0px 10px 0px 10px;">
+                <table outline="0" border-c bgcolor="#fff" cellpadding="0" cellspacing="0" width="100%" style="display:block;padding: 3px;max-width: 600px; border:1px solid #fff">
+                    <tr>
+                        <td  align="left" style="font-family: 'Lato', Helvetica, Arial, sans-serif;padding-left: 10px; font-weight: bold"> <br>
+                            Thông tin nhận hàng
+                        </td>
+                    </tr>
+                    <tr>
+                        <td  align="left" style="font-family: 'Lato', Helvetica, Arial, sans-serif;padding-left: 10px;"> <br>
+                            Tên người nhận: {{order.name}}
+                        </td>
+                    </tr>
+                    <tr>
+                         <td  align="left" style="font-family: 'Lato', Helvetica, Arial, sans-serif;padding-left: 10px;"> <br>
+                            Địa chỉ Email: {{order.email}}
+                        </td>
+                    </tr>
+                    <tr>
+                    <td  align="left" style="font-family: 'Lato', Helvetica, Arial, sans-serif;padding-left: 10px;"> <br>
+                            Số điện thoại: {{order.phone_number}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td  align="left" style="font-family: 'Lato', Helvetica, Arial, sans-serif;padding: 0 10px 20px 10px;"> <br>
+                            Địa chỉ giao hàng: {{order.address}}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+  
+        </tr>
+  
+        <tr>
+            <td bgcolor="#f4f4f4" align="center" style="padding: 20px 10px 20px 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+                    <tr>
+                        <td bgcolor="#7fad39" align="center" style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #ffffff; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; ">
+                            <h2 style="font-size: 20px; font-weight: 400; color: #ffffff; margin: 0;">SVAT Support Team© 2021 SVAT All rights reserved.</h2>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,538 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% block title %}
+{{ product.name }}
+{% endblock title %}
+{% load i18n %}
+{% load humanize %}
+
+{% block css %}
+
+<style>
+
+.text-center {
+    text-align: center!important;
+}
+
+
+.product-details {
+    padding-top: 80px;
+}
+
+.spad {
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+.product__details__pic__item img {
+    min-width: 100%;
+}
+
+.product__details__pic__item--large {
+  width: 100%;
+  height: 400px;
+  object-fit: contain;
+}
+
+img {
+    max-width: 100%;
+}
+
+.product__details__text .product__details__price {
+    font-size: 30px;
+    color: #d22;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.product__details__text p {
+    margin-bottom: 45px;
+}
+
+.product__details__quantity {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.pro-qty {
+    width: 130px;
+    height: 40px;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    background: #f5f5f5;
+    margin-bottom: 5px;
+}
+
+.pro-qty .qtybtn {
+    width: 35px;
+    font-size: 16px;
+    color: #6f6f6f;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.pro-qty input {
+    height: 100%;
+    width: 100%;
+    font-size: 25px;
+    color: #6f6f6f;
+    width: 50px;
+    border: none;
+    background: #f5f5f5;
+    text-align: center;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.pro-qty .qtybtn {
+    width: 35px;
+    font-size: 25px;
+    color: #6f6f6f;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.primary-btn {
+    display: inline-block;
+    font-size: 14px;
+    padding: 10px 28px 10px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 700;
+    background: #7fad39;
+    letter-spacing: 2px;
+}
+
+.product__details__text .primary-btn {
+    padding: 16px 28px 14px;
+    margin: 0;
+    border: 0;
+}
+
+.product__details__text ul {
+    border-top: 1px solid #ebebeb;
+    padding-top: 40px;
+    margin-top: 50px;
+    padding-left: 0;
+}
+
+.product__details__text ul li {
+    font-size: 16px;
+    color: #1c1c1c;
+    list-style: none;
+    line-height: 36px;
+    margin-bottom: 10px;
+}
+
+.product__details__text ul li b {
+    font-weight: 900;
+    width: 100px;
+    display: inline-block;
+}
+
+.product__details__text ul li .share {
+    display: inline-block;
+}
+
+.product__details__text ul li .share a {
+    display: inline-block;
+    font-size: 15px;
+    color: #1c1c1c;
+    margin-right: 25px;
+}
+
+.product__details__text ul li span samp {
+    color: #d22;
+}
+
+
+.owl-item img {
+    width: auto;
+    height: 100px;
+    max-height: 100px;
+}
+
+/* tab Description */
+.product__details__tab {
+    padding-top: 85px;
+}
+
+.product__details__tab .nav-tabs {
+    border-bottom: none;
+    justify-content: center;
+    position: relative;
+}
+
+.product__details__tab .nav-tabs li {
+    margin-bottom: 0;
+    margin-right: 65px;
+}
+
+.product__details__tab .nav-tabs li a {
+    font-size: 16px;
+    color: #999;
+    font-weight: 700;
+    border: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 0;
+}
+.tab-content>.tab-pane {
+    display: none;
+}
+
+.product__details__tab .product__details__tab__desc {
+    padding-top: 44px;
+}
+
+.product__details__tab .product__details__tab__desc h6 {
+    font-weight: 900;
+    color: #333;
+    margin-bottom: 26px;
+}
+
+.product__details__tab .product__details__tab__desc p {
+    color: #666;
+}
+
+.tab-content>.active {
+    display: block;
+}
+
+.product__details__pic__item {
+    margin-bottom: 20px;
+}
+
+.product__details__pic__slider.owl-carousel .owl-item img {
+    width: 100%;
+}
+
+.owl-loaded {
+  overflow: hidden;
+}
+
+.owl-stage {
+    position: relative;
+    -ms-touch-action: pan-Y;
+    touch-action: manipulation;
+    -moz-backface-visibility: hidden;
+    display: flex;
+    overflow: hidden;
+}
+.owl-prev {
+   display: none;
+}
+.disabled {
+   display: none !important;
+}
+
+.border-container-img {
+  border-right: 1px solid #e6e6e6;
+}
+
+.btn-option {
+  border: 1px solid grey;
+}
+
+.btn-selected {
+  background: #7fad39;
+  color: white;
+}
+
+.couple-btn button {
+  width: 100%;
+  margin: 5px 0 !important;
+}
+
+.mobile_title {
+  font-size: medium !important;
+}
+
+</style>
+
+
+{% endblock %}
+
+{% block content %}
+
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'user/global/images/bg-breadcrumb.png' %}" style="background-image: url(&quot;{% static 'user/global/images/bg-breadcrumb.png' %}&quot;);">
+  <div class="container h-100">
+      <div class="text-center h-100 ">
+        <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+          <h2 {% if request.is_mobile %} class="mobile_title" {% endif %}>{{ product.name }}</h2>
+      </div>
+    </div>
+</div>
+</section>
+
+  <div class="container-fluid w-80 bg-white mt-4 p-4">
+    <div class="row">
+
+      <div class="col-lg-6 col-md-6 border-container-img">
+        <div class="product__details__pic">
+          <div class="product__details__pic__item">
+            <img class="product__details__pic__item--large" id="bigImage" src="/media/{{product.images.0.file_path}}" alt="" data-pagespeed-url-hash="232668656" onload="pagespeed.CriticalImages.checkImageForCriticality(this);">
+          </div>
+          <div class="product__details__pic__slider">
+            {% for image in product.images %}
+              <img src="/media/{{image.file_path}}">
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-6 p-0">
+        <div class="product__details__text">
+          {% csrf_token %}
+          <div class="pl-3">
+            <input type="hidden" id="product-id" name="product-id" value="{{product.id}}">
+            <h3>{{ product.name }}</h3>
+            <!-- price -->
+            <div class="product__details__price" data-is-hide-price="{{product.is_hide_price}}">
+                {% if product.is_hide_price == 0 %}
+                  <span id="total-price">{{ models.first.price | floatformat:0 | intcomma }}</span>đ
+                {% else %}
+                  <span id="total-price">Giá: Liên hệ</span>
+                {% endif %}
+            </div>
+          </div>
+          <ul class="mt-3 p-3">
+
+            <!-- quantity -->
+            {% if models.first.quantity > 0 %}
+              <li><b>{% trans "availability" %}</b> <span id="current-quantity">{{models.first.quantity}}</span></li>
+            {% else %}
+              <li><b>{% trans "availability" %}</b>  {% trans "soldout" %}</li>
+            {% endif %}
+
+            <!-- shipping -->
+            <li><b>{% trans "shipping" %}</b> <span>Từ 1 - 2 ngày.</span></li>
+
+            <!-- weight -->
+            {% if models|length > 0 %}
+            <li>
+              <b>{% trans "weight" %}</b> 
+              <div id="current-weight">
+              {% for model in models %}
+                {% if forloop.first %}
+                <button data-id="{{model.id}}" class="btn btn-option btn-selected" data-price="{{model.price | floatformat:0 | intcomma}}" data-quantity="{{model.quantity}}">{{model.weight}}</button>
+                {% else %}
+                <button data-id="{{model.id}}" class="btn btn-option" data-price="{{model.price | floatformat:0 | intcomma}}" data-quantity="{{model.quantity}}">{{model.weight}}</button>
+                {% endif %}
+              {% endfor %}
+              </div>
+            </li>
+            {% endif %}
+
+            <li>
+              <b>{% trans "quantity" %}</b>
+              {% if product.quantity != 0 %}
+              <div class="product__details__quantity">
+                <div class="quantity" style="user-select: none;">
+                  <div class="pro-qty"><span class="dec qtybtn" id="decBtn">-</span>
+                    <input type="number" id="quantity" value="1">
+                    <span class="inc qtybtn" id="incBtn">+</span></div>
+                </div>
+              </div>
+              {% else %}
+              <div class="product__details__quantity" aria-disabled="true">
+                <div class="quantity" style="user-select: none;">
+                  <div class="pro-qty"><span class="dec qtybtn" id="decBtn">-</span>
+                    <input type="number" id="quantity" value="1">
+                    <span class="inc qtybtn" id="incBtn">+</span></div>
+                </div>
+              </div>
+              {% endif %}
+            </li>
+          </ul>
+          <div {% if request.is_mobile %}class="p-3 mt-3 couple-btn"{% endif %}>
+          {% if product.total_quantity > 0 and product.is_hide_price == 0 %}
+            <button class="ml-3 flat-btn primary-btn add-to-card-btn">{% trans "btn-add-to-cart" %}</button>
+            <button class="ml-2 flat-btn primary-btn checkout-now-btn" >{% trans "checkout-now" %}</button>
+          {% else %}
+            <button class="ml-3 flat-btn primary-btn add-to-card-btn" disabled>{% trans "btn-add-to-cart" %}</button>
+            <button class="ml-2 flat-btn primary-btn checkout-now-btn" disabled>{% trans "checkout-now" %}</button>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12">
+        <div class="product__details__tab pt-4">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#tabs-1" role="tab" aria-selected="false">{% trans "label-product-desc" %}</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+              <div class="product__details__tab__desc">
+                {{ product.des | safe}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="container-fluid w-80">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="section-title related__product__title mb-4 mt-5" {% if request.is_mobile %} style="margin-top:1rem !important;" {% endif %}>
+          <h2 {% if request.is_mobile %}style="font-size: 1.5rem"{% endif %}>{% trans "label-related-products" %}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row bg-white p-5" {% if request.is_mobile %} style="padding: 0 !important;" {% endif %}>
+      {% for product in related_products %}
+      <div class="col-lg-3 col-6 {% if request.is_mobile %}border{% endif %}" {% if request.is_mobile %} style="padding: 0 !important;" {% endif %}>
+              {% include 'user/components/product.html' with product=product %}
+          </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+  
+
+  $(document).ready(function(){
+
+    let currentWeightSelected = $('#current-weight .btn-selected')
+
+    function formatNumber(str){
+        str += '';
+        x = str.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? ',' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + '.' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    function valueOfNumber(formattedNumber){
+      let number = formattedNumber.replaceAll('.', '')
+      number = number.replaceAll(',', '.')
+      return parseFloat(number)
+    }
+
+    function calculatePrice(){
+      if (currentWeightSelected.data('price') && $('.product__details__price').data('is-hide-price') == 0) {
+        let quantity = $('#quantity').val()
+        let currentPriceUnit = valueOfNumber(currentWeightSelected.data('price'))
+        let price = currentPriceUnit * quantity
+        $('#total-price').text(formatNumber(price))
+      }
+    }
+
+    $('#quantity').on('change', calculatePrice)
+    $('.btn-option').on('click', function(){
+      currentWeightSelected.removeClass('btn-selected')
+      $(this).addClass('btn-selected')
+      currentWeightSelected = $(this)
+      $('#current-quantity').text($(this).data('quantity'))
+      calculatePrice()
+    })
+
+    $(".product__details__pic__slider").owlCarousel({
+        loop: true,
+        autoplay: true,
+        margin: 20,
+        items: 4,
+        dots: false,
+        navigation: false,
+    });
+
+    $('#incBtn').on('click', function(){
+      let currentQuantity = parseInt($('#quantity').val())
+      $('#quantity').val(currentQuantity + 1)
+      calculatePrice()
+    })
+
+    $('#decBtn').on('click', function(){
+      let currentQuantity = parseInt($('#quantity').val())
+      if (currentQuantity > 1){
+        $('#quantity').val($('#quantity').val() - 1)
+      }
+      calculatePrice()
+    })
+
+    $('.owl-item img').on('click', function(){
+      let imgPath = $(this).attr('src')
+      $('#bigImage').attr('src', imgPath)
+    })
+
+    $('.checkout-now-btn').click(function(){
+      const data = {
+        product_id: $('#product-id').val(),
+        product_model_id: $('#current-weight .btn-selected').data('id'),
+        quantity: $('#quantity').val()
+      }
+
+      const url = `/${window.location.pathname.split('/')[1]}/checkout-now`;
+      $.ajax({
+        url,
+        type: "POST",
+        headers: {
+          "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+        },
+        dataType: 'json',
+        processData: false,
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function(data) {
+         window.location = "{% url 'user.checkout' %}"
+        }
+      })
+    })
+
+    $('.add-to-card-btn').click(function(){
+      const data = {
+        product_id: $('#product-id').val(),
+        product_model_id: $('#current-weight .btn-selected').data('id'),
+        quantity: $('#quantity').val()
+      }
+
+      const url = `/${window.location.pathname.split('/')[1]}/add-product-to-cart`;
+      $.ajax({
+        url,
+        type: "POST",
+        headers: {
+          "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+        },
+        dataType: 'json',
+        processData: false,
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function(data) {
+          if (data.success) {
+            $('.total-cart-span').html(data.data.total)
+            toastr.success(data.message)
+          } else {
+            toastr.warning(data.message)
+          }
+        }
+      })
+    })
+
+  })
+</script>
+
+{% endblock %}

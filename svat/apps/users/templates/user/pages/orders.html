@@ -1,0 +1,233 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}Đơn hàng{% endblock title %}
+{% load humanize %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'user/user-page/css/styles.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{% csrf_token %}
+
+<!-- Modal cancel order -->
+<div class="modal fade" id="deleteOrder" tabindex="-1" role="dialog" aria-labelledby="deleteOrderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content rounded-0">
+        <div class="modal-header">
+            <h5 class="modal-title text-dark font-weight-bold" id="deleteOrderLabel">{% trans 'order-cancel' %}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-danger" id="alertDeleteError" role="alert" style="display:none">
+                <span id="deleteErrorMsg"></span>
+            </div>
+            {% trans 'order-confirm-question' %} <b>#</b><span id="deleteOrderId" style="font-weight: bold;"></span>?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn flat-btn bg-secondary" data-dismiss="modal" style="color:white;background-color:gray">{% trans 'order-confirm-no' %}</button>
+            <button type="button" class="btn flat-btn" id="confirm-cancel" style="background-color:#7fad39">{% trans 'order-confirm-yes' %}</button>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- Site wrapper -->
+
+        <section class="breadcrumb-section set-bg" data-setbg="/static/user/global/images/bg-breadcrumb.png" style="background-image: url(&quot;/static/user/global/images/bg-breadcrumb.png&quot;);">
+          <div class="container h-100">
+            <div class="text-center h-100">
+                <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+                    <h2>{% trans 'user-order' %}</h2>
+                </div>
+            </div>
+        </section>
+
+        <div class="site-content mt-4">
+            <div class="container-fluid w-80 bg-white">
+                <div class="grid grid--stackable">
+                    <div class="grid__column three-twelfths tablet--four-twelfths">
+                        <div class="sidebar">
+                            <div class="account-sidebar rounded-0">
+                                <div class="account-sidebar__user">
+                                    <span id="fullname_navbar" class="text--bold" style="margin: auto;text-transform: uppercase;">{{user.name}}</span>
+                                </div>
+                                <div class="account-sidebar__item">
+                                    <a href="{% url 'user.view_profile' %}" class="account-sidebar__menu ">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11.299" height="11.193" viewBox="0 0 11.299 11.193">
+                                            <g id="avatar2" transform="translate(0.001 -1.916)">
+                                                <g id="Group_2514" data-name="Group 2514" transform="translate(-0.001 1.916)">
+                                                    <path id="Path_816" data-name="Path 816" d="M115.376,7.846a2.775,2.775,0,0,0,2.533-2.965c0-2.271-1.134-2.965-2.533-2.965s-2.533.694-2.533,2.965A2.775,2.775,0,0,0,115.376,7.846Z" transform="translate(-109.727 -1.916)"></path>
+                                                    <path id="Path_817" data-name="Path 817" d="M11.243,225.636l-1.278-2.879a.641.641,0,0,0-.289-.308l-1.983-1.033a.128.128,0,0,0-.136.011,3.129,3.129,0,0,1-3.815,0,.128.128,0,0,0-.136-.011l-1.983,1.033a.641.641,0,0,0-.289.308L.055,225.636a.639.639,0,0,0,.584.9h10.02a.639.639,0,0,0,.584-.9Z" transform="translate(0.001 -215.342)"></path>
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span>{% trans "user-infomation" %}</span>
+                                    </a>
+
+                                    <a href="{% url 'user.view_orders' %}" class="account-sidebar__menu account-sidebar__menu--active">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11.312" height="12.598" viewBox="0 0 11.312 12.598">
+                                            <g id="Group_2516" data-name="Group 2516" transform="translate(0.1 0.1)">
+                                                <path data-name="Path 818" d="M112.416,200.484a.484.484,0,0,0-.484-.484h-4.988a.484.484,0,1,0,0,.969h4.988A.484.484,0,0,0,112.416,200.484Z" transform="translate(-104.525 -195.157)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 819" d="M106.943,280a.484.484,0,1,0,0,.969h3.029a.484.484,0,0,0,0-.969Z" transform="translate(-104.525 -273.22)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 820" d="M30.127,11.429h-1.62a.97.97,0,0,1-.969-.969V1.937a.97.97,0,0,1,.969-.969h5.954a.97.97,0,0,1,.969.969V4.915a.484.484,0,0,0,.969,0V1.937A1.939,1.939,0,0,0,34.461,0H28.507A1.939,1.939,0,0,0,26.57,1.937V10.46A1.939,1.939,0,0,0,28.507,12.4h1.62a.484.484,0,1,0,0-.969Z" transform="translate(-26.57)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 821" d="M248.891,272.449a1.454,1.454,0,0,0-2.054,0l-2.659,2.653a.484.484,0,0,0-.121.2l-.579,1.906a.484.484,0,0,0,.593.607l1.955-.541a.484.484,0,0,0,.213-.124l2.653-2.648A1.454,1.454,0,0,0,248.891,272.449Zm-3.247,3.927-.983.272.288-.948,1.794-1.79.685.685Zm2.563-2.558-.094.094-.685-.685.094-.093a.484.484,0,0,1,.685.685Z" transform="translate(-238.205 -265.437)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 822" d="M111.931,120h-4.988a.484.484,0,1,0,0,.969h4.988a.484.484,0,1,0,0-.969Z" transform="translate(-104.525 -117.094)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                            </g>
+                                        </svg>
+                                        <span>{% trans "user-order" %}</span>
+                                    </a>
+
+                                    </a>
+                                    <a href="{% url 'user.logout' %}" class="account-sidebar__menu">
+                                        <svg height="512" width="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M480.971 239.029l-90.51-90.509a24 24 0 00-33.942 0 24 24 0 000 33.941L406.059 232H144a24 24 0 00-24 24 24 24 0 0024 24h262.059l-49.54 49.539a24 24 0 0033.942 33.941l90.51-90.51a24 24 0 000-33.941z"></path><path d="M304 392a24 24 0 00-24 24v24H72V72h208v24a24 24 0 0048 0V64a40 40 0 00-40-40H64a40 40 0 00-40 40v384a40 40 0 0040 40h224a40 40 0 0040-40v-32a24 24 0 00-24-24z"></path></svg>
+                                        <span>{% trans "user-exits" %}</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid__column nine-twelfths tablet--eight-twelfths" style="margin-bottom:30px">
+                   
+                        <h3 class="text-dark font-weight-bold" style="margin-bottom:30px;">{% trans 'user-order' %} ({{orders.count}})</h3>
+                        {% for order in orders %}
+                            <div class="data-order">
+                                <div class="order-card rounded-0" data-order-token="">
+                                    <div class="header">
+                                        <div class="heading">
+                                            <div class="text--primary">#{{ order.id }}</div>
+                                            <span>{{ order.created }}</span>
+                                            <time datetime="{{ order.created }}"> 
+                                        </div>
+                                            {% if order.status == 0 %}
+                                            <div style="display: flex;float: right;">
+                                                <button class="status confirmed cancel_order" value="{{ order.id }}" style="background-color: gray;">
+                                                    <span> {% trans 'order-cancel' %}</span>
+                                                </button>
+                                                <div class="status confirmed">
+                                                    <span> {% trans 'order-pre-processing' %}</span>
+                                                </div>
+                                            </div>
+                                            {% elif order.status == 1 %}
+                                             <div style="display: flex;float: right;">
+                                                <button class="status confirmed cancel_order" value="{{ order.id }}" style="background-color: gray;">
+                                                    <span> {% trans 'order-cancel' %}</span>
+                                                </button>
+                                                <div class="status confirmed">
+                                                    <span> {% trans 'order-processing' %}</span>
+                                                </div>
+                                            </div>
+                                            {% elif order.status == 2 %}
+                                            <div class="status confirmed">
+                                                <span>{% trans 'order-delivering' %}</span>
+                                            </div>
+                                            {% elif order.status == 3 %}
+                                            <div class="status confirmed" style="background-color: gray;">
+                                            <span >{% trans 'order-delivered' %}</span>
+                                            </div>
+                                            {% else %}
+                                            <div class="status confirmed" style="background-color: gray;">
+                                            <span >{% trans 'order-canceled' %}</span>
+                                            </div>
+                                            {% endif %}
+                                    </div>
+                                    {% for order_product in order.order_product %}
+
+                                    <a href="{% url 'user.detail_product' id=order_product.product_model.product.id %}">
+                                        <div class="list">
+                                                <div class="item">
+                                                    <div class="image">
+                                                        <img src="/media/{{order_product.product_model.product.product_thumbnail}}" alt="">
+                                                    </div>
+                                                    <div class="title">
+                                                        <div class="show-3line">
+                                                            {% if request.LANGUAGE_CODE == 'vi' %}
+                                                                {{order_product.product_model.product.product_language_vi.name}}
+                                                            {% else %}
+                                                                {{order_product.product_model.product.product_language_en.name}}
+                                                            {% endif %}
+                                                           
+                                                        </div>
+                                                        <span class="quantity">{% trans 'order-quantity' %} {{order_product.quantity}}</span>
+                                                    </div>
+                                                    <div class="cost">
+                                                        <div>
+                                                            {{ order_product.product_model.price | floatformat:0 | intcomma }}đ
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    {% endfor %}
+                                    <div class="actions">
+                                        <div class="total shipping">
+                                            Phí vận chuyển:
+                                            {% if order.status < 1 %}
+                                              <span>Chờ xử lý</span>
+                                            {% else %}
+                                              <span>{{order.shipping_fee | floatformat:0 | intcomma }}đ</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="total">
+                                            {% trans 'order-total' %}
+                                            <span>{{order.total | floatformat:0 | intcomma }}đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock content %}
+{% block script %}
+<script>
+
+    $(document).ready(function() {
+        $(document).on('click', '.cancel_order', function(e){
+            $("#deleteOrderId").val($(this).val())
+            $("#deleteOrderId").text($(this).val())
+            $('#deleteOrder').modal('show')
+        })
+
+        $('#confirm-cancel').on('click', function(){
+            let data = {
+                id: $("#deleteOrderId").val(),
+            }       
+            $('#deleteOrder').modal('hide')
+            let url = `/${window.location.pathname.split('/')[1]}/user/deleteOrder`;
+
+            $.ajax({
+                url,
+                type: 'POST',
+                headers: {
+                    "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+                },
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(
+                    data
+                ),
+            }).then(data => {
+                        if (!data.success) {
+                            toastr.error("Có lôi xảy ra")
+                        } else {
+                            toastr.success("Hủy đơn hàng thành công")
+                            setTimeout(function(){
+                                window.location.reload(true);
+                            }, 2000);
+                        }
+                    })
+
+            })
+    
+    })
+</script>
+{% endblock script %}
+

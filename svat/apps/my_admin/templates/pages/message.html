@@ -1,0 +1,173 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+{% block css %}
+{% endblock css %}
+{% block content %}
+
+<style>
+  .dataTables_filter{
+    float: left !important;
+  }
+  .disableRow{
+    background: #d4d4d4 !important;
+  }
+
+  /* table general */
+  th:first-child {
+    width:1%;
+    white-space: nowrap;
+  }
+
+  td:last-child {
+    white-space: nowrap;
+    width: 1%;
+  }
+
+  td:last-child button:first-child {
+    margin-right: 10px;
+  }
+</style>
+<div class="content container-fluid" style="padding: 1rem">
+
+<div class="row p-2">
+  <div class="col"><h3>Phản hồi khách hàng</h3></div>
+  <div class="col"></div>
+</div>
+
+<div class="modal fade" id="warningModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cảnh báo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="id_message" style="display: none;"></p>
+        <p>Phản hồi bị chuyển trạng thái sang <mark>Đã xử lý</mark> Bạn sẽ không thể thay đổi trạng thái nữa. Bạn có chắc muốn tiếp tục?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="confirmUpdate">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="card card-primary card-outline">
+    <div class="card-body">
+      <table id="all_message" class="table table-bordered table-hover table-fixed" style="width:100%">
+        <thead>
+          <tr>
+            <th>Id<nav></nav></th>
+              <th>Họ tên<nav></nav></th>
+              <th>Email</th>
+              <th>Nội dung</th>
+              <th>Thời gian</th>
+              <th>Thao tác</th>
+          </tr>
+      </thead>
+        </table>
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
+{% block script %}
+<script>
+    function addLeadingZero(strDate){
+      return ('0' + strDate.toString()).slice(-2)
+    }
+
+    function formatDate(date, includedTime=false){
+        let dateStr = `${addLeadingZero(date.getUTCDate())}/${addLeadingZero(date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`
+        let timeStr = ''
+
+        if(includedTime === true){
+            timeStr = `${addLeadingZero((date.getUTCHours() + 7) % 24)}:${addLeadingZero(date.getUTCMinutes())}:${addLeadingZero(date.getUTCSeconds())}`
+        }
+        
+        return `${dateStr} ${timeStr}`
+    }
+    
+    var tableMessage = $('#all_message').DataTable({
+        "serverSide": true,
+        "ajax": {
+            url: "/en/admin/get_all_message",
+            type: "GET"
+        },
+        "pageLength": 20,
+        "searchDelay": 500,
+        "bLengthChange": false,
+        "ordering": false,
+        "createdRow": function( row, data, dataIndex){
+          if( data.status ==  1 ){
+            $(row).addClass('disableRow');
+          }
+        },
+        "columns": [
+            { "data": "id" },
+            { "data": "name" },
+            { "data": "email" },
+            { "data": "message" },
+            {
+              "data": "created",
+              "render": function(data, type, row, meta){
+                if(data === null) return ''
+                let date = new Date(data)
+                return formatDate(date, true)
+              }
+            },
+            {
+              "data": "actions",
+              "render": function ( data, type, row, meta ) {
+                let btnUpdate = $('<button class="btn btn-success update-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"> <path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z"/> </svg></button>')
+                if (row.status == 1 ) btnUpdate.attr('disabled', true)
+                return `${btnUpdate[0].outerHTML} `
+
+              }
+            }
+
+        ]
+    });
+
+    $(document).on('click', '.update-btn', function(){
+      messageRow = $(this).parents('tr')[0]
+      message = tableMessage.row(messageRow).data()
+      $('#warningModal').modal('show')
+      $("#id_message").val(message.id)
+    })
+
+    $(document).on('click', '#confirmUpdate', function(){
+      $('#warningModal').modal('hide')
+
+      let data={
+        id: $("#id_message").val(),
+      }
+
+      let url = `/${window.location.pathname.split('/')[1]}/admin/process_message`;
+
+      $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            toastr.success('Cập nhật trạng thái thành công')
+            setTimeout(function(){
+                                window.location.reload(true);
+                            }, 2000);
+          }
+      })
+    })
+
+
+</script>
+{% endblock script %}
+ 

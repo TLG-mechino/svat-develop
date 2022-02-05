@@ -1,0 +1,174 @@
+{% extends 'user/layout/base.html' %} 
+{% load static %} 
+{% block title %}Trang chủ{% endblock title %}
+{% load i18n %} 
+{% block content %}
+
+{% block css %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca&family=Pattaya&family=Sriracha&display=swap');
+.spad {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+ 
+.section-title h2 {
+  padding: 10px;
+  background: #add57f;
+  font-size: 24px;
+  font-family: 'Pattaya', sans-serif;
+  color: #2c6a0f;
+}
+ 
+.section-title h2:before {
+  content: "";
+  border-style: solid;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: unset;
+  background: unset;
+  border-width: 24px 0 0 24px;
+  border-color: #679335 transparent transparent transparent;
+}
+ 
+.section-title h2:after {
+  content: "";
+  border-style: solid;
+  height: 100%;
+  left: 100%;
+  width: unset;
+  background: unset;
+  top: 0;
+  border-width: 24px 0 24px 24px;
+  border-color: transparent transparent transparent #add57f;
+}
+ 
+@media only screen and (max-width: 600px) {
+  .section-title h2 {
+    font-size: 18px;
+  }
+
+  .section-title h2:before {
+    border-width: 18px 0 0 18px;
+  }
+
+}
+
+</style>
+{% endblock css %}
+
+{% if not request.is_mobile %}
+{% comment %} Desktop {% endcomment %}
+<section class="hero" style="margin-bottom: 30px;">
+  <div style="position: relative">
+    <a href="{% url 'user.product.list' %}" >
+      <img class="w-100" style="height: 400px" src="{% static 'user/global/images/main-banner.jpg' %}">
+    </a>
+  </div>
+</section>
+<div class="container-fluid w-80 p-0 bg-white">
+<div class="row">
+  <div class="col-3">
+    {% include 'user/components/sidebar.html' with categories=product_categories showArticles=True %}
+  </div>
+
+  <div class="col-9">
+    <section class="featured spad pb-0">
+      <div class="row w-100">
+        <div class="">
+          <div class="section-title">
+            <h2><i class="fab fa-shopify"></i> {% trans "home-feature-product" %}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row w-100 featured__filter" id="MixItUp00DEA2">
+        {% for product in feature_products %}
+        <div class="col-lg-3 col-md-4 col-sm-6 p-0">
+          {% include 'user/components/product.html' with product=product %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="latest-product spad">
+      <div class="row w-100">
+        <div class="">
+          <div class="section-title">
+            <h2><i class="fas fa-tags"></i> {% trans "home-latest-product" %}</h2>
+          </div>
+        </div>
+      </div>
+      <div class="row w-100">
+        {% for product in lastest_products %}
+        <div class="col-lg-3 col-md-4 col-sm-6 p-0">
+          {% include 'user/components/product.html' with product=product %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+</div>
+</div>
+
+{% else %}
+
+{% comment %} Mobile part {% endcomment %}
+<section class="hero" style="margin-bottom: 30px;">
+  <div style="position: relative">
+    <a href="{% url 'user.product.list' %}" >
+      <img class="w-100" style="height: 200px" src="{% static 'user/global/images/main-banner.jpg' %}">
+    </a>
+  </div>
+</section>
+<div class="container-fluid w-80 p-0 bg-white">
+  <section class="featured spad pb-0">
+    <div class="row w-100 m-0">
+      <div class="">
+        <div class="section-title">
+          <h2><i class="fab fa-shopify"></i> {% trans "home-feature-product" %}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row w-100 m-0 featured__filter" id="MixItUp00DEA2">
+      {% for product in feature_products %}
+      <div class="col-6 p-0 border">
+        {% include 'user/components/product.html' with product=product %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="latest-product spad">
+    <div class="row w-100 m-0">
+      <div class="">
+        <div class="section-title">
+          <h2><i class="fas fa-tags"></i> {% trans "home-latest-product" %}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row w-100 m-0 ">
+      {% for product in lastest_products %}
+      <div class="col-6 p-0 border">
+        {% include 'user/components/product.html' with product=product %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endif %}
+
+
+{% endblock content %}
+
+{% block script %}
+<script src="{% static 'user/homepage/js/jquery-ui.min.js'%}"></script>
+<script src="{% static 'user/homepage/js/jquery.slicknav.js'%}"></script>
+<script src="{% static 'user/homepage/js/mixitup.min.js'%}"></script>
+<script src="{% static 'user/homepage/js/owl.carousel.min.js'%}"></script>
+<script src="{% static 'user/homepage/js/main.js'%}"></script>
+{% endblock script %}
+

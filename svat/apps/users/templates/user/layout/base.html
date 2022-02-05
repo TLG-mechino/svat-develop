@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- favi icon -->
+  <link rel="shortcut icon" type="image/jpg" href="{% static 'user/global/images/logo.png' %}"/>
+  <title>
+  {% block title %}{% endblock title %}
+  </title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% include "user/layout/base_css.html" %}
+  {% block css %}{% endblock css %}
+</head>
+<body>
+
+<!-- Messenger Plugin chat Code -->
+<div id="fb-root"></div>
+
+<!-- Your Plugin chat code -->
+<div id="fb-customer-chat" class="fb-customerchat">
+</div>
+
+<script>
+  var chatbox = document.getElementById('fb-customer-chat');
+  chatbox.setAttribute("page_id", "101737715535514");
+  chatbox.setAttribute("attribution", "biz_inbox");
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      xfbml            : true,
+      version          : 'v11.0'
+    });
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://connect.facebook.net/vi_VN/sdk/xfbml.customerchat.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<!-- Site wrapper -->
+<div class="wrapper">
+
+  {% if request.is_mobile %}
+    {% include "user/layout/mobile/navbar.html" %}
+  {% else %}
+  <header class="header">
+    {% include "user/layout/header.html" %}
+    {% include "user/layout/navbar.html" %}
+    {% include "user/layout/menu_searchbox.html" %}
+  </header>
+  {% endif %}
+
+
+  <div class="content-wrapper">
+    {% block content %}{% endblock content %}
+  </div>
+
+  {% include "user/layout/footer.html" %}
+
+{% include "user/layout/base_js.html" %}
+{% block script %}{% endblock script %}
+</body>
+</html>

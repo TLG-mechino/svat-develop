@@ -1,0 +1,261 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% block title %}Thông tin cá nhân{% endblock title %}
+{% load i18n %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'user/user-page/css/styles.css' %}">
+{% endblock css %}
+
+{% block content %}
+    <!-- Site wrapper -->
+        {% csrf_token %}
+            <section class="breadcrumb-section set-bg" data-setbg="/static/user/global/images/bg-breadcrumb.png" style="background-image: url(&quot;/static/user/global/images/bg-breadcrumb.png&quot;);">
+                <div class="container h-100">
+                    <div class="text-center h-100">
+                        <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+                            <h2>{% trans 'user-infomation' %}</h2>
+                        </div>
+                    </div>
+                </section>
+        <div class="site-content mt-3">
+            <div class="container-fluid w-80 bg-white">
+                <div class="grid grid--stackable">
+                    <div class="grid__column three-twelfths tablet--four-twelfths">
+                        <div class="sidebar">
+                            <div class="account-sidebar">
+                                <div class="account-sidebar__user">
+                                    <span id="fullname_navbar" class="text--bold" style="margin: auto;">{{user.name}}</span>
+                                </div>
+                                <div class="account-sidebar__item">
+                                    <a href="{% url 'user.view_profile' %}" class="account-sidebar__menu account-sidebar__menu--active">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11.299" height="11.193" viewBox="0 0 11.299 11.193">
+                                            <g id="avatar2" transform="translate(0.001 -1.916)">
+                                                <g id="Group_2514" data-name="Group 2514" transform="translate(-0.001 1.916)">
+                                                    <path id="Path_816" data-name="Path 816" d="M115.376,7.846a2.775,2.775,0,0,0,2.533-2.965c0-2.271-1.134-2.965-2.533-2.965s-2.533.694-2.533,2.965A2.775,2.775,0,0,0,115.376,7.846Z" transform="translate(-109.727 -1.916)"></path>
+                                                    <path id="Path_817" data-name="Path 817" d="M11.243,225.636l-1.278-2.879a.641.641,0,0,0-.289-.308l-1.983-1.033a.128.128,0,0,0-.136.011,3.129,3.129,0,0,1-3.815,0,.128.128,0,0,0-.136-.011l-1.983,1.033a.641.641,0,0,0-.289.308L.055,225.636a.639.639,0,0,0,.584.9h10.02a.639.639,0,0,0,.584-.9Z" transform="translate(0.001 -215.342)"></path>
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span>{% trans "user-infomation" %}</span>
+                                    </a>
+
+                                    <a href="{% url 'user.view_orders' %}" class="account-sidebar__menu ">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11.312" height="12.598" viewBox="0 0 11.312 12.598">
+                                            <g id="Group_2516" data-name="Group 2516" transform="translate(0.1 0.1)">
+                                                <path data-name="Path 818" d="M112.416,200.484a.484.484,0,0,0-.484-.484h-4.988a.484.484,0,1,0,0,.969h4.988A.484.484,0,0,0,112.416,200.484Z" transform="translate(-104.525 -195.157)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 819" d="M106.943,280a.484.484,0,1,0,0,.969h3.029a.484.484,0,0,0,0-.969Z" transform="translate(-104.525 -273.22)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 820" d="M30.127,11.429h-1.62a.97.97,0,0,1-.969-.969V1.937a.97.97,0,0,1,.969-.969h5.954a.97.97,0,0,1,.969.969V4.915a.484.484,0,0,0,.969,0V1.937A1.939,1.939,0,0,0,34.461,0H28.507A1.939,1.939,0,0,0,26.57,1.937V10.46A1.939,1.939,0,0,0,28.507,12.4h1.62a.484.484,0,1,0,0-.969Z" transform="translate(-26.57)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 821" d="M248.891,272.449a1.454,1.454,0,0,0-2.054,0l-2.659,2.653a.484.484,0,0,0-.121.2l-.579,1.906a.484.484,0,0,0,.593.607l1.955-.541a.484.484,0,0,0,.213-.124l2.653-2.648A1.454,1.454,0,0,0,248.891,272.449Zm-3.247,3.927-.983.272.288-.948,1.794-1.79.685.685Zm2.563-2.558-.094.094-.685-.685.094-.093a.484.484,0,0,1,.685.685Z" transform="translate(-238.205 -265.437)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                                <path data-name="Path 822" d="M111.931,120h-4.988a.484.484,0,1,0,0,.969h4.988a.484.484,0,1,0,0-.969Z" transform="translate(-104.525 -117.094)" fill="currentColor" stroke="#bfbfbf" stroke-width="0.2"></path>
+                                            </g>
+                                        </svg>
+                                        <span>{% trans "user-order" %}</span>
+                                    </a>
+
+                                    </a>
+                                    <a href="{% url 'user.logout' %}" class="account-sidebar__menu">
+                                        <svg height="512" width="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M480.971 239.029l-90.51-90.509a24 24 0 00-33.942 0 24 24 0 000 33.941L406.059 232H144a24 24 0 00-24 24 24 24 0 0024 24h262.059l-49.54 49.539a24 24 0 0033.942 33.941l90.51-90.51a24 24 0 000-33.941z"></path><path d="M304 392a24 24 0 00-24 24v24H72V72h208v24a24 24 0 0048 0V64a40 40 0 00-40-40H64a40 40 0 00-40 40v384a40 40 0 0040 40h224a40 40 0 0040-40v-32a24 24 0 00-24-24z"></path></svg>
+                                        <span>{% trans "user-exits" %}</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid__column nine-twelfths tablet--eight-twelfths" style="margin-bottom:30px">
+                        <div class="account-section" style="padding-left: 25px;">
+
+                            <div class="form__group grid align--center   mgt--300">
+                                <div class="grid__column three-twelfths desk--four-twelfths tablet--one-whole">
+                                    <label class="form__label">{% trans 'user-fullname' %}</label>
+                                </div>
+                                <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                    <input id="fullname" type="text" name="fullname" class="form-control" value="{{user.name}}">
+                                </div>
+                            </div>
+                            <div class="form__group grid align--center  ">
+                                <div class="grid__column three-twelfths desk--four-twelfths tablet--one-whole">
+                                    <label class="form__label">Email</label>
+                                </div>
+                                <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                    <input id="email" type="email" name="email" class="form-control" value="{{user.email}}" disabled="">
+                                </div>
+                            </div>
+                            <div class="form__group grid align--center  ">
+                                <div class="grid__column three-twelfths desk--four-twelfths tablet--one-whole">
+                                    <label class="form__label">{% trans 'user-phone-number' %}</label>
+                                </div>
+                                <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                    <input type="text" id="phone" name="phone" class="form-control form-control--number" value="{{user.phone_number}}">
+                                </div>
+                            </div>
+                            <div class="form__group grid align--center  ">
+                                <div class="grid__column three-twelfths desk--four-twelfths tablet--one-whole">
+                                    <label class="form__label">{% trans 'user-address' %}</label>
+                                </div>
+                                <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                    <input type="text" name="address" class="form-control pac-target-input" id="address" value="{{user.address}}" placeholder="Nhập vị trí" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form__group grid align--center  ">
+                                <div class="grid__column three-twelfths desk--four-twelfths tablet--one-whole">
+                                    <label class="form__label">{% trans 'user-dob' %} </label>
+                                    <br><span style="font-size: 13px;"></span> </div>
+                                <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                    {% if user.dob != None %}
+                                    <input type="date" id="birthday" name="birthday" class="form-control" data-datetime="" autocomplete="off" value="{{user.dob}}" >
+                                    {% else %}
+                                    <input type="date" id="birthday" name="birthday" class="form-control" data-datetime="" autocomplete="off"  >
+                                    {% endif  %}
+                                </div>
+                            </div>
+
+
+                            <div class="form__group group-change-password">
+                                <label class="checkbox checkbox--primary">
+                                        <span class="text--primary" style="cursor: pointer">{% trans 'user-change-password' %}</span>
+                                        <input type="checkbox" name="change_password" id="accountPasswordToggle_Btn">
+                                        <span class="checkbox__mark"></span>
+                                    </label>
+                            </div>
+                            <div id="accountPasswordToggle" class="account__password-toggle" style="display: none;">
+                                <div class="form__group grid align--center  ">
+                                    <div class="grid__column three-twelfths desk--four-twelfths tablet--one-whole">
+                                        <label class="form__label">{% trans "user-new-password" %}</label>
+                                    </div>
+                                    <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                        <input id="user-new-password" type="password" name="password" class="form-control" autocomplete="false">
+                                    </div>
+                                </div>
+                                <div class="form__group grid align--center mgb--30">
+                                    <div class="grid__column three-twelfths desk--four-twelfths desk--four-twelfths tablet--one-whole">
+                                        <label class="form__label">{% trans "user-re-new-password" %}</label>
+                                    </div>
+                                    <div class="grid__column six-twelfths desk--seven-twelfths tablet--one-whole">
+                                        <input id="confirm-password" type="password" name="password_confirmation" class="form-control" autocomplete="false">
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="updateprofile" class="btn flat-btn" style="border-radius: 0;">{% trans 'user-update' %}
+                                </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock content %}
+{% block script %}
+<script type="text/javascript">
+    function PasswordBoxToggle() {
+        $("#accountPasswordToggle_Btn").change(function() {
+            if ($("#accountPasswordToggle_Btn:checked").length) {
+                $("#accountPasswordToggle").show();
+            } else {
+                $("#accountPasswordToggle").hide();
+            }
+        })
+    }
+    PasswordBoxToggle()
+</script>
+
+<script>
+    $(document).ready(function() {
+        function isValidProfile(){
+            phone_rule = /(0)+([0-9]{9})\b/;
+            if($('#fullname').val() === '') return [false, "Tên người dùng không được để trống"]
+            if( $('#phone').val() === '') return [false, "Số điện thoại không được để trống"]
+            if( !phone_rule.test($('#phone').val())) return [false, "Vui lòng nhập đúng số điện thoại"]
+            return [true, ""] 
+        }
+        
+        $('#updateprofile').on('click', function() {
+            status_update = $("#accountPasswordToggle_Btn:checked").length
+            let [isValid, msg] = isValidProfile()
+
+            if(isValid){
+                if (status_update) {
+                    new_password = $('#user-new-password').val()
+                    re_new_password = $('#confirm-password').val()
+                    password_rule = /^\d{8,256}$/;
+                    if (password_rule.test(new_password) == true && password_rule.test(re_new_password) == true) {
+                        if (new_password == re_new_password) {
+                            let data = {
+                                "status_update": status_update,
+                                "fullname": $('#fullname').val(),
+                                "phone": $('#phone').val(),
+                                "email": $('#email').val(),
+                                "address": $('#address').val(),
+                                "dob": $('#birthday').val(),
+                                "new_password": new_password,
+                            }
+                            let url = `/${window.location.pathname.split('/')[1]}/user/updateprofile`;
+
+                            $.ajax({
+                                url,
+                                type: 'POST',
+                                headers: {
+                                    "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+                                },
+                                dataType: 'json',
+                                contentType: 'application/json; charset=utf-8',
+                                data: JSON.stringify(
+                                    data
+                                ),
+                            }).then(data => {
+                                if (!data.success) {
+                                    toastr.error("Có lôi xảy ra")
+
+                                } else {
+                                    toastr.success("Cập nhật thông tin thành công")
+                                    window.location.reload(true);
+                                }
+                            })
+                        } else {
+                            toastr.warning("Mật khẩu mới không khớp")
+                        }
+                    } else {
+                        toastr.warning("Mật khẩu có ít nhất 8 ký tự")
+                    }
+
+
+                } else {
+                    let data = {
+                        "status_update": status_update,
+                        "fullname": $('#fullname').val(),
+                        "phone": $('#phone').val(),
+                        "email": $('#email').val(),
+                        "address": $('#address').val(),
+                        "dob": $('#birthday').val(),
+                    }
+                    let url = `/${window.location.pathname.split('/')[1]}/user/updateprofile`;
+
+                    $.ajax({
+                        url,
+                        type: 'POST',
+                        headers: {
+                            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+                        },
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8',
+                        data: JSON.stringify(
+                            data
+                        ),
+                    }).then(data => {
+                        if (!data.success) {
+                            toastr.error("Có lôi xảy ra")
+                        } else {
+                            toastr.success("Cập nhật thông tin thành công")
+                            $('#fullname_navbar').text( $('#fullname').val()  )
+                        }
+                    })
+                }
+            }else{
+                toastr.warning(msg)
+            }
+        })
+
+    })
+</script>
+{% endblock script %}
+

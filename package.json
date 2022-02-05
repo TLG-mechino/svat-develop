@@ -1,0 +1,27 @@
+{
+  "name": "svat",
+  "version": "1.0.0",
+  "description": "Init project - Ubuntu/debian: sudo apt-get install python3-dev default-libmysqlclient-dev build-essential",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tienanhnguyen191999/svat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tienanhnguyen191999/svat/issues"
+  },
+  "homepage": "https://github.com/tienanhnguyen191999/svat#readme",
+  "dependencies": {
+    "admin-lte": "^3.1.0",
+    "ckeditor4": "^4.16.0",
+    "datatables.net": "^1.10.24",
+    "datatables.net-dt": "^1.10.24",
+    "owl.carousel": "^2.3.4"
+  }
+}

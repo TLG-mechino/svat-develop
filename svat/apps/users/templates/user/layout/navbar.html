@@ -1,0 +1,56 @@
+{% load i18n %}
+{% load static %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-3">
+      <div class="header__logo ">
+        <a href="{% url 'user.index' %}">
+          <img style="padding-left: 2rem; height: 75px" src="{% static 'user/global/images/logo.png' %}" alt="">
+        </a>
+      </div>
+    </div>
+    <div class="col-7">
+      <nav class="header__menu">
+        <ul class="pl-0">
+          <li id="menu_item__home">
+            <a href="{% url 'user.index' %}">{% trans "header-home" %}</a>
+          </li>
+          <li id="menu_item__product">
+            <a href="{% url 'user.product.list' %}">{% trans "header-product" %}</a>
+          </li>
+          <li id="menu_item__articles">
+            <a href="{% url 'user.article.list' %}">{% trans "header-article" %}</a>
+          </li>
+          <li id="menu_item__contact">
+            <a href="{% url 'user.contact' %}">{% trans "header-contact" %}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="col-2">
+      <div class="header__cart mt-3">
+        <ul class="m-0">
+          <li>
+            <a href="{% url 'user.shopping_cart' %}">
+              <i class="fa fa-shopping-bag"></i>
+              <span class="total-cart-span">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block script %}
+
+<script>
+  let itemNameFromUrl = window.location.pathname.split('/')[2]
+  let menuItem = document.getElementById(`menu_item__${itemNameFromUrl}`)
+  if (!menuItem) menuItem = document.getElementById(`menu_item__home`)
+  menuItem.classList += 'active'
+
+</script>
+
+{% endblock %}

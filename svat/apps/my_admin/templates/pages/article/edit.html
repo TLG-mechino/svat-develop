@@ -1,0 +1,399 @@
+{% extends 'layout/base.html' %} {% block content %} {% load static %} 
+{% block css %}
+
+<!-- daterange picker -->
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %}"/>
+<!-- dropzonejs -->
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/dropzone/min/dropzone.min.css' %}" />
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/dropzone/min/basic.min.css' %}" />
+
+<style>
+  #cke_id_vi-content,
+  #cke_id_en-content,
+  .django-ckeditor-widget {
+    width: 100% !important;
+  }
+
+  .dropzone {
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+  input[type="file"] {
+    display: none
+  }
+  [href="#vi-tab"]::after, [href="#en-tab"]::after {
+    visibility: hidden;
+    content: "!";
+    color: red;
+    padding: 0px 4px;
+    border-radius: 50%;
+    border: 2px solid;
+    font-size: 0.75rem;
+    font-weight: bold;
+    position: relative;
+    left: 0.5rem;
+    bottom: 0.125rem;
+  }
+  .card-danger[href="#vi-tab"]::after, .card-danger[href="#en-tab"]::after {
+    visibility: visible;
+  }
+  #thumbnail.red-border {
+    border: 2px dashed red;
+  }
+  .red-line-border {
+    border: 1px solid red;
+  }
+</style>
+
+{% endblock css %} 
+<div class="container-fluid">
+  <div class="row p-2">
+    <div class="col"><h3>Cập nhật bài viết</h3></div>
+    <div class="col"></div>
+  </div>
+  <div class="card card-primary card-outline">
+    <div class="card-header"></div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <form id="article-form">
+        {% csrf_token %}
+        
+        <div class="col-12">
+          <div class="row">
+            <div class="form-group col-6">
+              <label for="">Thể loại </label>
+              <select class="custom-select" name="article_category">
+                <option value="">Chọn thể loại...</option>
+                {% for item in article_category%}
+                  <option value="{{item.id}}" {% if item.id == article.article_category.id %}selected{% endif %}>{{item.name_vi}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="">Thời gian đăng</label>
+              <!-- Date and time range -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="far fa-clock"></i
+                  ></span>
+                </div>
+                <input
+                  type="text"
+                  class="form-control float-right"
+                  id="reservationtime"
+                  name="post_at"
+                  value="{{ article.post_at | date:"d/m/Y H:i:s" }}"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="">Ảnh Bìa</label>
+             <div id="thumbnail" class="fallback dropzone">
+              <input name="filename_hidden" type="hidden" />
+              <input name="filename" type="file" />
+            </div>
+            <span id="exampleInputEmail1-error" class="error invalid-feedback"
+              >Lỗi</span
+            >
+          </div>
+          <div class="card card-primary card-outline card-outline-tabs">
+            <div class="card-header p-0 border-bottom-0">
+              <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                <li class="nav-item">
+                  <a
+                    class="nav-link active"
+                    id="custom-tabs-four-home-tab"
+                    data-toggle="pill"
+                    href="#vi-tab"
+                    role="tab"
+                    aria-controls="custom-tabs-four-home"
+                    aria-selected="true"
+                    >Tiếng việt</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    id="custom-tabs-four-profile-tab"
+                    data-toggle="pill"
+                    href="#en-tab"
+                    role="tab"
+                    aria-controls="custom-tabs-four-profile"
+                    aria-selected="false"
+                    >Tiếng Anh</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="card-body">
+              <div class="tab-content" id="custom-tabs-four-tabContent">
+                <div
+                  class="tab-pane fade show active"
+                  id="vi-tab"
+                  role="tabpanel"
+                  aria-labelledby="custom-tabs-four-home-tab"
+                >
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label for="">Tiêu đề</label>
+                      <input
+                        type="text"
+                        name="title_vi"
+                        class="form-control"
+                        value="{{ article.article_language_vi.title }}"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Nội dung</label>
+                      <div>{{ form_vi.media }} {{ form_vi }}</div>
+                    </div>
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="en-tab"
+                  role="tabpanel"
+                  aria-labelledby="custom-tabs-four-profile-tab"
+                >
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label for="">Tiêu đề</label>
+                      <input
+                        name="title_en"
+                        class="form-control"
+                        value="{{ article.article_language_en.title }}"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Nội dung</label>
+                      <div>{{ form_en.media }} {{ form_en }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+      <button type="submit" class="float-right btn btn-primary submit-btn">
+        Thêm bài viết
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock content %} {% block script %}
+<!-- moment -->
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<!-- dropzonejs -->
+<script src="{% static 'admin-lte/plugins/dropzone/min/dropzone.min.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- jquery-validation -->
+<script src="{% static 'admin-lte/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src={% static 'admin-lte/plugins/jquery-validation/additional-methods.min.js' %}""></script>
+
+<script>
+    // datetimepicker
+    $(document).ready(function () {
+        $("#reservationtime").daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        timePicker: true,
+        timePickerIncrement: 30,
+        locale: {
+            format: "DD/MM/YYYY hh:mm:ss",
+        },
+        });
+    });
+
+    // dropzone
+    $("#thumbnail").dropzone({
+        url: "/vi/admin/uploads",
+        headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+        },
+        addRemoveLinks: true,
+        removedfile: function(file) {
+            var _ref;
+            this.options.maxFiles = this.options.maxFiles + 1;
+            return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
+        },
+        maxFiles: 1,
+        maxFilesize: 5,
+        acceptedFiles: ".jpeg,.jpg,.png,.gif",
+        success: function (file, response) {
+            var imgName = response.name;
+            file.previewElement.classList.add("dz-success");
+            $('[name=filename_hidden]').val(imgName);
+            $('#article-form').valid();
+        },
+        error: function (file, response) {
+            file.previewElement.classList.add("dz-error");
+        },
+        init: function () {
+            let myDropzone = this;
+            // If the thumbnail is already in the right size on your server:
+            mockFile = { name: "Filename", size: 12345 };
+            let callback = null; // Optional callback when it's done
+            let crossOrigin = null; // Added to the `img` tag for crossOrigin handling
+            let resizeThumbnail = true; // Tells Dropzone whether it should resize the image first
+            myDropzone.displayExistingFile(mockFile, `${window.location.origin}/media/{{article.thumbnail.file_path}}`, callback, crossOrigin, resizeThumbnail);
+            let fileCountOnServer = 2; // The number of files already uploaded
+            $('[name="filename_hidden"]').val("{{article.thumbnail.file_path}}")
+            myDropzone.options.maxFiles = myDropzone.options.maxFiles - 1;
+        }
+    });
+
+
+    //deal with copying the ckeditor text into the actual textarea
+    CKEDITOR.on('instanceReady', function () {
+          $.each(CKEDITOR.instances, function (instance) {
+              CKEDITOR.instances[instance].document.on("keyup", CK_jQ);
+              CKEDITOR.instances[instance].document.on("paste", CK_jQ);
+              CKEDITOR.instances[instance].document.on("keypress", CK_jQ);
+              CKEDITOR.instances[instance].document.on("blur", CK_jQ);
+              CKEDITOR.instances[instance].document.on("change", CK_jQ);
+          });
+      });
+    function CK_jQ() {
+      for (instance in CKEDITOR.instances) {
+          CKEDITOR.instances[instance].updateElement();
+      }
+      // revalidate
+      $('#article-form').valid();
+    }
+
+    // Validate on submit
+    $("#article-form").validate({
+      ignore: [],
+      debug: false,
+      rules: {
+        "article_category": {
+          required: true,
+        },
+        "post_at": {
+          required: true,
+        },
+        "title_vi": {
+          required: true,
+        },
+        "title_en": {
+          required: true,
+        },
+        "filename_hidden":{
+          required: true
+        },
+        "vi-content":{
+          required: true
+        },
+        "en-content":{
+          required: true
+        }
+      },
+      messages: {
+        "article_category": {
+          required: "Bắt buộc nhập danh mục",
+        },
+        "post_at": {
+          required: "Bắt buộc nhập thời gian đăng",
+        },
+        "title_vi": {
+          required: "Bắt buộc nhập tiêu đề",
+        },
+        "title_en": {
+          required: "Bắt buộc nhập tiêu đề",
+        },
+        "en-content": {
+          required: "Bắt buộc nhập nội dung",
+        },
+        "vi-content": {
+          required: "Bắt buộc nhập nội dung",
+        },
+        "filename_hidden": {
+          required: "Bắt buộc nhập ảnh bìa",
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+        if ($(element).attr("name") == 'title_vi') $('[href="#vi-tab"]').addClass("card-danger")
+        if ($(element).attr("name") == 'title_en') $('[href="#en-tab"]').addClass("card-danger")
+        if ($(element).attr("name") == 'filename_hidden') $('#thumbnail').addClass("red-border")
+        if ($(element).attr("name") == 'vi-content') $('#cke_id_vi-content').addClass("red-line-border")
+        if ($(element).attr("name") == 'en-content') $('#cke_id_en-content').addClass("red-line-border")
+        
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+        if ($(element).attr("name") == 'title_vi') $('[href="#vi-tab"]').removeClass("card-danger")
+        if ($(element).attr("name") == 'title_en') $('[href="#en-tab"]').removeClass("card-danger")
+        if ($(element).attr("name") == 'filename_hidden') $('#thumbnail').removeClass("red-border")
+        if ($(element).attr("name") == 'vi-content') $('#cke_id_vi-content').removeClass("red-line-border")
+        if ($(element).attr("name") == 'en-content') $('#cke_id_en-content').removeClass("red-line-border")
+      },
+      submitHandler: function(form) {
+        // call ajax
+        let data = getData();
+        let url = `/${window.location.pathname.split('/')[1]}/admin/article/edit`;
+        $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            if (data.success) {
+              {% comment %} toastr.success('Cập nhật thành công') {% endcomment %}
+              window.location = `/${window.location.pathname.split('/')[1]}/admin/article`
+            }
+          }
+        })
+      }
+    });
+
+    function getData() {
+      result = {}
+      result['id'] = window.location.pathname.split('/').splice(-1, 1)[0]
+      result['article_category'] = $('[name="article_category"]').val()
+      result['post_at'] = $('[name="post_at"]').val() 
+      result['thumbnail'] = $('[name="filename_hidden"]').val().replace('\\', '/')
+      result['title_vi'] = $('[name="title_vi"]').val()
+      result['title_en'] = $('[name="title_en"]').val()
+      result['en_content'] = CKEDITOR.instances['id_en-content'].getData()
+      result['vi_content'] = CKEDITOR.instances['id_vi-content'].getData()
+      return result;
+    }
+
+    // register event
+    $('.submit-btn').click(function(){
+      $('#article-form').submit();
+    })
+
+</script>
+{% endblock script %}

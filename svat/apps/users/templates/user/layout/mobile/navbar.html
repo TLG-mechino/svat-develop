@@ -1,0 +1,138 @@
+{% load i18n %}
+{% load static %}
+
+<div class="container p-0">
+  <div class="row pl-2 w-100">
+    <div class="col-4">
+      <div class="header__logo">
+        <a href="{% url 'user.index' %}">
+          <img style="padding-left: 0.5rem; height: 50px" src="{% static 'user/global/images/logo.png' %}" alt="">
+        </a>
+      </div>
+    </div>
+
+    <div class="col-8 p-0 d-flex justify-content-end align-items-center">
+
+      <!-- change language -->
+      {% comment %}<div class="header__cart header__top__right__language m-0 mr-1">{% endcomment %}
+        {% comment %}<img class="nav-bar-mobile-img" id="current-lang-img" src="data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAABwAwCdASobAA4APm0skkWkIqGYBABABsSxAE6ADcGtd+FD6qAA/vV+Wp4VqyJwr3tsqzUVysGAxh5jK++StlIxrHdqkxyfiwYlcgHy6RWg//tsvaTR2IctDJnOE/5mY93zrj0P0ea+n9DmVodGk7RubcK/qHhB4yLFEzBhQuGAAA==" alt="">{% endcomment %}
+        {% comment %}<ul>{% endcomment %}
+          {% comment %}<li id="vi_choice">Vietnamese</li>{% endcomment %}
+          {% comment %}<li id="en_choice">English</li>{% endcomment %}
+        {% comment %}</ul>{% endcomment %}
+      {% comment %}</div>{% endcomment %}
+
+    <div class="header__cart mr-1">
+      <ul class="m-0">
+        <form action="{% url 'user.product.list' %}" id="search-box-form">
+          <div class="search-box">
+            <button type="submit" class="btn-search"><i class="fas fa-search"></i></button>
+            <input type="text" class="input-search" name="search_keyword">
+          </div>
+        </form>
+      </ul>
+    </div>
+
+      <!-- cart -->
+      <div class="header__cart mr-1">
+        <ul class="m-0">
+          <li>
+            <a href="{% url 'user.shopping_cart' %}">
+              <i class="fa fa-shopping-bag nav-bar-mobile-icon" ></i>
+              <span class="total-cart-span">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- user -->
+      <div class="header__cart header__top__right__auth">
+        {% if user.name %}
+        <i class="fa fa-user nav-bar-mobile-icon"></i>
+        <ul style="z-index: 1025; margin: 0">
+          <li><a href="{% url 'user.view_profile' %}">{% trans "user-infomation" %}</a></li>
+          <li><a href="{% url 'user.view_orders' %}">{% trans "user-order" %}</a></li>
+          <li><a href="{% url 'user.logout' %}">{% trans "user-exits" %}</a></li>
+        </ul>
+        {% else %}
+        <a href="{% url 'user.login' %}"><i class="fa fa-user nav-bar-mobile-icon"></i></a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+  
+
+</div>
+  <div class="sticky-top">
+  <div class="row w-100 m-0 nav-bar-category-mobile mobile mb-4 ">
+    <div class="col-6 product-category hero hero-normal p-0">
+      <div class="hero__categories m-0 ">
+        <div class="hero__categories__all">
+          <i class="fa fa-bars"></i>
+          <span>Sản phẩm</span>
+        </div>
+        <ul class="all-category">
+          {% comment %} Call Api {% endcomment %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-6 article-category hero hero-normal p-0">
+      <div class="hero__categories m-0">
+        <div class="hero__categories__all">
+          <i class="fa fa-bars"></i>
+          <span>Bài viết</span>
+        </div>
+        <ul class="all-category-article">
+          {% comment %} Call Api {% endcomment %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  </div>
+
+{% block script %}
+
+<script>
+  $("#search-box-form").submit(function(e) {
+    if (!($('[name="search_keyword"]').is(":focus") || $('[name="search_keyword"]').width() > 23)) {
+      e.preventDefault();
+      $('[name="search_keyword"]').focus();
+    } 
+  })
+
+  $()
+
+  let englishFlagImg = 'data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAABwAwCdASobAA4APm0skkWkIqGYBABABsSxAE6ADcGtd+FD6qAA/vV+Wp4VqyJwr3tsqzUVysGAxh5jK++StlIxrHdqkxyfiwYlcgHy6RWg//tsvaTR2IctDJnOE/5mY93zrj0P0ea+n9DmVodGk7RubcK/qHhB4yLFEzBhQuGAAA=='
+  let vietnameseFlagImg = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNjAwIj4NCjxwYXRoIGZpbGw9IiNkYTI1MWQiIGQ9Im0wLDBoOTAwdjYwMGgtOTAweiIvPg0KPHBhdGggZmlsbD0iI2ZmMCIgZD0ibTQ5NC44NSwyMzcuNTEyaDE0NS4xNWwtMTE3LjQyLDg0Ljk4NSA0NC44NSwxMzcuNTAzLTExNy40My04NC45ODQtMTE3LjQzLDg0Ljk4NCA0NC44Ni0xMzcuNTAzLTExNy40My04NC45ODVoMTQ1LjE1bDQ0Ljg1LTEzNy41MTIgNDQuODUsMTM3LjUxMnoiLz4NCjwvc3ZnPg0K'
+
+  let currentLangImg = document.getElementById('current-lang-img')
+
+  let langCode = window.location.pathname.split('/')[1]
+  if (langCode === 'vi'){
+    currentLangImg.src = vietnameseFlagImg
+  }
+  else{
+    currentLangImg.src = englishFlagImg
+  }
+
+  let viChoice = document.getElementById('vi_choice')
+  let enChoice = document.getElementById('en_choice')
+
+  viChoice.addEventListener('click', function(){
+    let currentPath = window.location.pathname.split('/')
+    currentPath[1] = "vi"
+    let newPath = currentPath.join('/')
+    window.location.href = window.location.origin + newPath + window.location.search
+  })
+
+  enChoice.addEventListener('click', function(){
+    let currentPath = window.location.pathname.split('/')
+    currentPath[1] = "en"
+    let newPath = currentPath.join('/')
+    window.location.href = window.location.origin + newPath + window.location.search
+  })
+</script>
+
+{% endblock %}

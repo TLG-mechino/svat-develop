@@ -1,0 +1,446 @@
+{% extends 'layout/base.html' %}
+
+{% load static %}
+{% block css %}
+
+{% endblock css %}
+
+{% block content %}
+
+<style>
+  .dataTables_filter{
+    float: left !important;
+  }
+
+  mark{
+    background: #a7c2ff;
+    border-radius: 1em;
+    font-weight: bold;
+    font-weight: 800;
+  }
+  .disableRow{
+    background: #d4d4d4 !important;
+  }
+
+  /* table general */
+  th:first-child {
+    width:1%;
+    white-space: nowrap;
+  }
+
+  td:last-child {
+    white-space: nowrap;
+    width: 1%;
+  }
+
+  td:last-child button:first-child {
+    margin-right: 10px;
+  }
+</style>
+
+<div class="modal fade" id="warningModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cảnh báo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Đơn hàng bị chuyển trạng thái sang <mark>Hoàn thành</mark> hoặc <mark>Hủy bỏ</mark> sẽ không thể thay đổi trạng thái nữa. Bạn có chắc muốn tiếp tục?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="confirmUpdate">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Shipping modal -->
+<div class="modal fade" id="shippingFeeModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận đơn hàng</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label for="">Phí shipping</label>
+        <input type="number" class="form-control" name="shipping-fee" placeholder="20.000"> 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+        <button type="button" class="btn btn-primary" id="update-fee-btn">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal View Order -->
+<div class="modal fade" id="viewOrderModal" tabindex="-1" role="dialog" aria-labelledby="viewOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewOrderModalLabel">Chi tiết đơn đặt hàng</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" id="alertCreateError" role="alert" style="display:none">
+          <span id="createErrorMsg"></span>
+        </div>
+        <form>
+          <div class="row">
+            <div class="form-group col">
+              <label for="customer-name" class="col-form-label">Tên</label>
+              <input type="text" class="form-control" id="customer-name" disabled>
+            </div>
+            <div class="form-group col">
+              <label for="customer-phone_number" class="col-form-label">Số điện thoại</label>
+              <input type="text" class="form-control" id="customer-phone_number" disabled>
+            </div>
+          </div>
+           <div class="row">
+            <div class="form-group col">
+              <label for="customer-address" class="col-form-label">Email</label>
+              <input type="text" class="form-control" id="customer-email" disabled>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col">
+              <label for="customer-address" class="col-form-label">Địa chỉ</label>
+              <input type="text" class="form-control" id="customer-address" disabled>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col">
+              <table id="order" class="table table-bordered table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                      <th>Mã sản phẩm</th>
+                      <th>Tên sản phẩm</th>
+                      <th>Giá cả</th>
+                      <th>Số lượng</th>
+                      <th>Tổng tiền</th>
+                    </tr>
+                  </thead>
+                </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col">
+              <label for="customer-address" class="col-form-label">Phí ship</label>
+              <input type="text" class="form-control" id="customer-shipping-fee" disabled>
+            </div>
+            <div class="form-group col">
+              <label for="customer-address" class="col-form-label">Tổng tiền</label>
+              <input type="text" class="form-control" id="customer-total" disabled>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="content container-fluid" style="padding: 1rem">
+
+  <div class="row p-2">
+    <div class="col"><h3>Danh sách đơn hàng</h3></div>
+    <div class="col"></div>
+  </div>
+  <div class="card card-primary card-outline">
+    <div class="card-body">
+      <table id="users" class="table table-bordered table-hover table-fixed" style="width:100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Tên người đặt</th>
+                <th>SĐT</th>
+                <th>Địa chỉ</th>
+                <th>Ngày đặt</th>
+                <th>Trạng thái</th>
+                <th>Action</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block script %}
+
+
+
+<script>
+
+    let editingRow = null
+    let currentViewOrderDataTable = null
+
+    function formatNumber(str){
+        str += '';
+        x = str.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? ',' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + '.' + '$2');
+        }
+        return x1 + x2;
+    }
+
+    function loadEditOrder(data){
+      $('#customer-name').val(data.order.name)
+      $('#customer-email').val(data.order.email)
+      $('#customer-address').val(data.order.address)
+      $('#customer-phone_number').val(data.order.phone_number)
+      $('#customer-shipping-fee').val(data.order.status <= 0 ? "Chờ xử lý" : formatNumber(data.order.shipping_fee))
+      $('#customer-total').val(formatNumber(data.order.total))
+
+      currentViewOrderDataTable = $('#order').DataTable({
+        "data": data.detail_orders,
+        "bLengthChange": false,
+        "paging": false,
+        "ordering": false,
+        "searching": false,
+        "info": false,
+        "columns": [
+          { "data": "id" },
+          { "data": "name" },
+          {
+            "data": "cost" ,
+            "render": function(data, type, row, meta){
+              return formatNumber(data)
+            }
+          },
+          { "data": "quantity" },
+          {
+            "data": "total",
+            "render": function(data, type, row, meta){
+              return formatNumber(row.cost * row.quantity)
+            }
+          }
+        ]
+      })
+    }
+
+    function addLeadingZero(strDate){
+      return ('0' + strDate.toString()).slice(-2)
+    }
+
+    function formatDate(date, includedTime=false){
+        let dateStr = `${addLeadingZero(date.getUTCDate())}/${addLeadingZero(date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`
+        let timeStr = ''
+
+        if(includedTime === true){
+            timeStr = `${addLeadingZero((date.getUTCHours() + 7) % 24)}:${addLeadingZero(date.getUTCMinutes())}:${addLeadingZero(date.getUTCSeconds())}`
+        }
+        
+        return `${dateStr} ${timeStr}`
+    }
+
+    var tableOrders = $('#users').DataTable({
+        "serverSide": true,
+        "ajax": {
+            url: "/en/admin/getAllOrder",
+            type: "GET"
+        },
+        "pageLength": 20,
+        "searchDelay": 500,
+        "bLengthChange": false,
+        "ordering": false,
+        "createdRow": function( row, data, dataIndex){
+          if( data.status ==  3 || data.status == 4){
+            $(row).addClass('disableRow');
+          }
+
+          handleStatusChange($(row).find('option'))
+        },
+        "columns": [
+            { "data": "id" },
+            { "data": "name" },
+            { "data": "phone_number" },
+            { "data": "address" },
+            {
+              "data": "created",
+              "render": function(data, type, row, meta){
+                if(data === null) return ''
+                let date = new Date(data)
+                return formatDate(date, true)
+              }
+            },
+            {
+              "data": "status",
+              "render": function(data, type, row, meta){
+                let selectBox = $('<select class="custom-select" aria-label="Select status"> <option value="0">Đặt hàng</option> <option value="1">Xử lý đơn hàng</option> <option value="2">Vận chuyển</option> <option value="3">Hoàn thành</option> <option value="4">Hủy bỏ</option> </select>')
+                selectBox.find(`option[value="${data}"]`).attr('selected', true);
+                if (row.status == 3 || row.status == 4) selectBox.attr('disabled', true)
+                return selectBox[0].outerHTML
+              }
+            },
+            {
+              "data": "actions",
+              "render": function ( data, type, row, meta ) {
+                let btnUpdate = $('<button class="btn btn-success update-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"> <path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z"/> </svg></button>')
+                let btnView = $('<button class="btn btn-primary view-order"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"> <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/> <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/> </svg></button>')
+                if (row.status == 3 || row.status == 4) btnUpdate.attr('disabled', true)
+                return `${btnUpdate[0].outerHTML} ${btnView[0].outerHTML}`
+
+              }
+            }
+        ]
+    });
+
+
+    // Event Controller
+
+    $(document).on('click', '.view-order', function(e){
+      let viewElement = $(this).parents('tr')[0]
+      let order_id = $(viewElement).find('td').first().text()
+      let data = {
+        id: order_id
+      }
+      let url = `/${window.location.pathname.split('/')[1]}/admin/getDetailOrder`;
+
+      $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            loadEditOrder(data)
+            $('#viewOrderModal').modal('show')
+          }
+      })
+    })
+
+    function updateOrder(){
+      let id = $(editingRow).find('td').first().text()
+      let status = $(editingRow).find('option:selected').val()
+      let url = `/${window.location.pathname.split('/')[1]}/admin/updateOrder`;
+
+      let data = {
+        id: id,
+        status: status
+      }
+      if (status == 1) {
+        sendEmailOrderInProgress(id)
+      }
+      $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            toastr.success('Cập nhật đơn hàng thành công')
+          }
+      })
+    }
+
+    $(document).on('click', '.update-btn', function(){
+      editingRow = $(this).parents('tr')[0]
+      let status = $(editingRow).find('option:selected').val()
+
+
+      if (status == 3 || status == 4){
+        $('#warningModal').modal('show')
+      } else if ( status == 1 ) {
+        $('#shippingFeeModal').modal('show')
+      }
+      else{
+        updateOrder()
+      }
+      
+      // update disable option
+      handleStatusChange($(editingRow).find('.custom-select option'))
+    })
+    
+    function sendEmailOrderInProgress (order_id) {
+      const url = "sendEmailOrderInProgress"
+      const data = { 
+        "order_id": order_id,
+        "shipping_fee": $('[name="shipping-fee"]').val()
+      }
+      $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+          }
+      })
+    }
+
+    function handleStatusChange(elements){
+      // return element without disable
+      var i = 0;
+      for (i ; i < elements.length; i++){
+        $(elements[i]).removeAttr('disabled');
+      }
+
+      i = 0;
+      for (i ; i < elements.length; i++){
+        if (!elements[i].selected) $(elements[i]).attr('disabled', true);
+        else break;
+      }
+
+      if (i == 2 ) i += 3
+      else i += 2
+      for (i; i < elements.length - 1; i++){
+        $(elements[i]).attr('disabled', true);
+      }
+    }
+
+    $(document).on('click', '#confirmUpdate', function(){
+      updateOrder()
+      $(editingRow).find('.custom-select').attr('disabled', true)
+      $(editingRow).find('.update-btn').attr('disabled', true)
+      $(editingRow).addClass('disableRow')
+      $('#warningModal').modal('hide')
+
+      $('.badge-order').html(parseInt($('.badge-order').html()) - 1)
+    })
+
+    $('#viewOrderModal').on('hidden.bs.modal', function (e) {
+      currentViewOrderDataTable.destroy()
+    })
+    $("#update-fee-btn").click(function () {
+      if (!$('[name="shipping-fee"]').val()) {
+        toastr.warning('Bắt buộc nhập phí ship')
+        return;
+      }
+      updateOrder();
+      $('#shippingFeeModal').modal('hide')
+    })
+
+</script>
+
+{% endblock script %}

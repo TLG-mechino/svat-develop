@@ -1,0 +1,57 @@
+{% load humanize %}
+{% load i18n %}
+
+<div class="featured__item product-component p-2 mb-1"  role="button">
+    
+    <!-- product thumbnail -->
+    <input type="hidden" value="{{product.id}}">
+    <div class="featured__item__pic set-bg {% if request.is_mobile %}product-image-mobile{% endif %}" data-setbg="/media/{{product.product_thumbnail}}" style="background-image: url(&quot;/media/{{product.product_thumbnail}}&quot;);">
+        <ul class="featured__item__pic__hover p-0 m-0">
+            {% if product.total_quantity > 0 and product.is_hide_price == 0 %}
+              <li><a href="{% url 'user.detail_product' id=product.id %}"><i class="fa fa-retweet"></i></a></li>
+              <li><a role="button" class="add-to-card-component-btn" data-model-id={{product.min_price_model.id}} data-id="{{product.id}}"><i class="fa fa-shopping-cart"></i></a></li>
+            {% else %}
+              <li><a href="{% url 'user.detail_product' id=product.id %}"><i class="fa fa-retweet"></i></a></li>        
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="featured__item__text text-left pb-0">
+        <!-- product name -->
+        {% csrf_token %}
+        <h6><a href="{% url 'user.detail_product' id=product.id %}" class="show-1line">
+          {% if request.LANGUAGE_CODE == "vi" %}
+              {{ product.product_language_vi.name }}
+          {% else %}
+              {{ product.product_language_en.name }}
+          {% endif %}
+        </a></h6>
+
+        <!-- product price -->
+        <div class="d-flex w-100 justify-content-between">
+        <h6 class="font-weight-bold d-inline-block m-0">
+        {% if product.is_hide_price == 1 %}
+            <i class="fa fa-phone" aria-hidden="true"></i> {% trans "header-contact" %}
+        {% else %}
+          {% if product.min_price == product.max_price %}
+              {{product.min_price | floatformat:0 | intcomma}}đ
+          {% else %}
+            {{product.min_price | floatformat:0 | intcomma}}đ - {{product.max_price | floatformat:0 | intcomma}}đ
+          {% endif %}
+        {% endif %}
+        </h6>
+
+        <!-- available status -->
+        {% if product.is_hide_price == 0 %}
+          {% if product.total_quantity > 0 %}
+            <small class="text-success font-weight-bold available-label">{% trans "available" %}</small>
+          {% else %}
+            <small class="text-muted font-weight-bold" style="min-width: 45px">{% trans "header-contact" %}</small>
+          {% endif %}
+        {% endif %}
+        </div>
+    </div>
+
+</div>
+
+

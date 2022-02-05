@@ -1,0 +1,145 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+{% if request.LANGUAGE_CODE == "vi" %}
+ {{ article.article_language_vi.title }}
+  {% else %}
+{{ article.article_language_en.title }}
+  {% endif %}
+{% endblock title %}
+{% load humanize %}
+
+{% block css %}
+
+<style>
+  .blog__details__hero__text h2{
+    padding: 0.25rem;
+    text-transform: capitalize;
+    font-family: 'Pattaya', sans-serif;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+<section class="blog-details-hero set-bg" data-setbg="/media/{{article.thumbnail.file_path}}" style="background-image: url(&quot;{% static 'user/global/images/banner2.jpg'%}&quot;); background-position: bottom;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="blog__details__hero__text">
+          {% if request.LANGUAGE_CODE == "vi" %}
+          <h2>{{ article.article_language_vi.title }}</h2>
+          {% else %}
+          <h2>{{ article.article_language_en.title }}</h2>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="blog-details container-fluid w-80 bg-white mt-4" >
+    <div class="row">
+      {% if not request.is_mobile %}
+      <div class="col-lg-3 col-md-5 order-md-1 order-1">
+        <div class="blog__sidebar">
+          <div class="blog__sidebar__item">
+            <h4 class="mb-2">{% trans "navbar-all-categories" %}</h4>
+            <ul>
+              {% for ele in categories %}
+              <li><a href="/articles?category={{ele.id}}">{{ele.name}}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="blog__sidebar__item">
+            <h4>{% trans "recent-posts-label" %}</h4>
+            <div class="blog__sidebar__recent">
+              {% for article in newest_articles %}
+              <a href="{% url 'user.detail_article' id=article.id %}" class="blog__sidebar__recent__item">
+                <div class="blog__sidebar__recent__item__pic">
+                  <img src="/media/{{article.thumbnail.file_path}}">
+                </div>
+                <div class="blog__sidebar__recent__item__text">
+                  {% if request.LANGUAGE_CODE == "vi" %}
+                  <h6>{{ article.article_language_vi.title }}</h6>
+                  {% else %}
+                  <h6>{{ article.article_language_en.title }}</h6>
+                  {% endif %}
+                  <span>{{article.post_at | date:"d/m/Y H:i:s"}}</span>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="col-lg-9 col-md-7 order-md-1 order-2 article-content pr-4">
+        <!-- title -->
+        <h5>
+          {% if request.LANGUAGE_CODE == "vi" %}
+          {{ article.article_language_vi.title | safe }}
+          {% else %}
+          {{ article.article_language_en.title | safe }}
+          {% endif %}
+        </h5>   
+
+        <em>
+        <small><i class="fa fa-calendar-o" aria-hidden="true"></i> {{ article.post_at | date:"d/m/Y H:i:s"}}</small> 
+        &nbsp;&nbsp;&nbsp;<small><i class="fa fa-file-text-o" aria-hidden="true"></i> 
+          {% if request.LANGUAGE_CODE == "vi" %}
+          {{ article.article_category.name_vi | safe }}
+          {% else %}
+          {{ article.article_category.name_en | safe }}
+          {% endif %}
+        </small> 
+        </em>
+        
+
+
+        <!-- content -->
+        <div class="blog__details__text mt-2">
+          {% if request.LANGUAGE_CODE == "vi" %}
+          <h2>{{ article.article_language_vi.content | safe }}</h2>
+          {% else %}
+          <h2>{{ article.article_language_en.content | safe }}</h2>
+          {% endif %}
+        </div>
+        <div class="blog__details__content">
+          <div class="row">
+            <div class="blog__details__author col-12 pr-5">
+              <div class="blog__details__author__text m-0 p-0">
+                <span>Tác giá: <b>{{ article.author.name }}</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+</section>
+
+
+<section class="related-blog spad">
+  <div class="container-fluid w-80 ">
+    <div class="row">
+      <div class="col-lg-12 ">
+        <div class="section-title related-blog-title mb-4">
+          <h2 {% if request.is_mobile %}style="font-size: 1.5rem"{% endif %}>{% trans "related-posts" %}</h2>
+        </div>
+      </div>
+    </div>
+    <div {% if request.is_mobile %} class="row bg-white p-0" {% else %} class="row bg-white p-4" {% endif %}>
+      {% for article in related_articles %}
+      <div {% if request.is_mobile %} class="col-lg-3 col-md-4 col-6 mix p-0 border" {% else %} class="col-lg-3 col-md-4 col-sm-6 mix" {% endif %}>
+              {% include 'user/components/article.html' with article=article %}
+          </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

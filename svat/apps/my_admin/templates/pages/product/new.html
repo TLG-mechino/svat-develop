@@ -1,0 +1,547 @@
+{% extends 'layout/base.html' %} {% block content %} {% load static %}
+{% block css %}
+
+<!-- daterange picker -->
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.css' %}"/>
+<!-- dropzonejs -->
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/dropzone/min/dropzone.min.css' %}" />
+<link rel="stylesheet" href="{% static 'admin-lte/plugins/dropzone/min/basic.min.css' %}" />
+
+<style>
+  #cke_id_vi-des,
+  #cke_id_en-des,
+  .django-ckeditor-widget {
+    width: 100% !important;
+  }
+
+  .dropzone {
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+  input[type="file"] {
+    display: none
+  }
+  [href="#vi-tab"]::after, [href="#en-tab"]::after {
+    visibility: hidden;
+    content: "!";
+    color: red;
+    padding: 0px 4px;
+    border-radius: 50%;
+    border: 2px solid;
+    font-size: 0.75rem;
+    font-weight: bold;
+    position: relative;
+    left: 0.5rem;
+    bottom: 0.125rem;
+  }
+  .card-danger[href="#vi-tab"]::after, .card-danger[href="#en-tab"]::after {
+    visibility: visible;
+  }
+  #images.red-border {
+    border: 2px dashed red;
+  }
+  .red-line-border {
+    border: 1px solid red;
+  }
+
+  .col-delete {
+    max-width: fit-content;
+  }
+
+  .btn-remove-attr {
+    padding: 0 16px;
+  }
+
+</style>
+
+{% endblock css %}
+
+<div class="modal fade" id="alert-no-price-product-modal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editUserModalLabel">Cảnh báo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert">
+          Tác vụ này sẽ khiến sản phẩm không thể tạo giỏ hàng. Bạn muốn tiếp tục chứ ?
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+        <button type="button" class="btn btn-primary" id="continue-delete">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row p-2">
+    <div class="col"><h3>Tạo mới sản phẩm</h3></div>
+    <div class="col"></div>
+  </div>
+  <div class="card card-primary card-outline">
+    <div class="card-header"></div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <form id="product-form">
+        {% csrf_token %}
+        <div class="row">
+          <div class="form-group col">
+            <label for="product_category" class="col-form-label">Thể loại</label>
+            <select class="form-control" id="product_category" name="product_category">
+              {% for item in product_category%}
+              <option value="{{item.id}}">{{item.name_vi}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div id="model">
+          <div id="model-attr">
+
+
+            <div class="row no-price">
+              <div class="col ">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="is-hide-price">
+                  <label class="form-check-label" for="flexcheckdefault">
+                    Ẩn giá sản phẩm <span data-toggle="tooltip" data-html="true" data-placement="top" title="sản phẩm sẽ để <code>giá: liên hệ</code>, và <code>không được phép đặt hàng</code> với nhưng sản phẩm này"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                  </label>
+                </div> 
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="form-group col col-weight">
+                <label for="weigth" class="col-form-label">Dung tích</label>
+                <input type="text" name="weight" placeholder="100ML" class="form-control weight-attr">
+              </div>
+              <div class="form-group col col-price">
+                <label for="price" class="col-form-label">Giá</label>
+                <input type="text" name="price" placeholder="25.000" class="form-control price-attr">
+              </div>
+              <div class="form-group col col-delete">
+                <label for="delete" class="col-form-label">Xóa</label>
+                <button style="padding: 0" name="delete" class="form-control btn btn-danger" type="button" disabled>
+                  <i class="fas fa-times-circle"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group col">
+              <input id="addNewAttr" style="width:100%" class="btn btn-primary" type="button" value="Thêm mới thuộc tính">
+            </div>
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <label for="">Ảnh sản phẩm <span style="color:red; font-size: smaller;"> *Tối đa: 6 ảnh</span></label>
+           <div id="images" class="fallback dropzone">
+            <input name="number_images_hidden" type="hidden" />
+            <input name="filename" type="file" multiple />
+          </div>
+          <span id="exampleInputEmail1-error" class="error invalid-feedback"
+            >Lỗi</span
+          >
+        </div>
+        <div class="card card-primary card-outline card-outline-tabs">
+          <div class="card-header p-0 border-bottom-0">
+            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  id="custom-tabs-four-home-tab"
+                  data-toggle="pill"
+                  href="#vi-tab"
+                  role="tab"
+                  aria-controls="custom-tabs-four-home"
+                  aria-selected="true"
+                  >Tiếng việt</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  id="custom-tabs-four-profile-tab"
+                  data-toggle="pill"
+                  href="#en-tab"
+                  role="tab"
+                  aria-controls="custom-tabs-four-profile"
+                  aria-selected="false"
+                  >Tiếng Anh</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content" id="custom-tabs-four-tabContent">
+              <div
+                class="tab-pane fade show active"
+                id="vi-tab"
+                role="tabpanel"
+                aria-labelledby="custom-tabs-four-home-tab"
+              >
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="">Tên sản phẩm</label>
+                    <input
+                      type="text"
+                      name="name_vi"
+                      class="form-control"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Mô tả sản phẩm</label>
+                    <div>{{ form_vi.media }} {{ form_vi }}</div>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <div
+                class="tab-pane fade"
+                id="en-tab"
+                role="tabpanel"
+                aria-labelledby="custom-tabs-four-profile-tab"
+              >
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="">Tên sản phẩm</label>
+                    <input
+                      name="name_en"
+                      class="form-control"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="exampleInputPassword1">Mô tả sản phẩm</label>
+                    <div>{{ form_en.media }} {{ form_en }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.card -->
+        </div>
+      </form>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+      <button type="submit" class="float-right btn btn-primary submit-btn">Thêm sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+{% endblock content %} {% block script %}
+<!-- moment -->
+<script src="{% static 'admin-lte/plugins/moment/moment.min.js' %}"></script>
+<!-- dropzonejs -->
+<script src="{% static 'admin-lte/plugins/dropzone/min/dropzone.min.js' %}"></script>
+<!-- date-range-picker -->
+<script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<!-- jquery-validation -->
+<script src="{% static 'admin-lte/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src={% static 'admin-lte/plugins/jquery-validation/additional-methods.min.js' %}""></script>
+
+<script>
+  // datetimepicker
+  $(document).ready(function () {
+    $("#reservationtime").daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true,
+      timePicker: true,
+      timePickerIncrement: 30,
+      locale: {
+        format: "DD/MM/YYYY hh:mm:ss",
+      },
+    });
+  });
+
+  function formatNumber(str){
+      str += '';
+      x = str.split('.');
+      x1 = x[0];
+      x2 = x.length > 1 ? ',' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + '.' + '$2');
+      }
+      return x1 + x2;
+  }
+
+  function valueOfNumber(formattedNumber){
+    let number = formattedNumber.replaceAll('.', '')
+    number = number.replaceAll(',', '.')
+    return parseFloat(number)
+  }
+
+  $(document).on('change', '.price-attr', function (e){
+    let number = valueOfNumber($(this).val())
+    let formattedNumber = formatNumber(number)
+    $(this).val(formattedNumber)
+  })
+
+  function getModel(){
+    let models = $('#model-attr .row:not(.no-price)')
+    let res = []
+    for (model of models) {
+      let weightEle = $(model).children().find('.weight-attr')[0]
+      let weight = $(weightEle).val()
+      let priceEle = $(model).children().find('.price-attr')[0]
+      let price = valueOfNumber($(priceEle).val())
+
+      if (price != '' && !isNaN(price)){
+        res.push({
+          weight: weight,
+          price: price
+        })
+      }
+
+    }
+
+    return res
+  }
+
+  let images = new Set()
+
+  // dropzone
+    let myDropzone = new Dropzone('#images', {
+      url: "/vi/admin/uploads",
+      headers: {
+        "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+      },
+      addRemoveLinks: true,
+      uploadMultiple: true,
+      parallelUploads: 4,
+      maxFilesize: 5, 
+      acceptedFiles: ".jpeg,.jpg,.png,.gif",
+      maxFiles: 6,
+      removedfile: function(file) {
+          var _ref;
+          if (file.dataURL) {
+            let fileName = file.dataURL.split('/').slice(-2).join('/')
+            images.delete(fileName)
+          }
+          if (images.size) {
+            $('[name=number_files_hidden]').val(images.size);
+          }
+          else {
+            $('[name=number_files_hidden]').val(null);
+          }
+          return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
+      },
+      success: function (file, response) {
+          response.name.forEach(item => images.add(item))
+          file.previewElement.classList.add("dz-success");
+          $('[name=number_images_hidden]').val(images.size);
+          $('#product-form').valid();
+      },
+      error: function (file, response) {
+          file.previewElement.classList.add("dz-error");
+      }
+    });
+
+    //deal with copying the ckeditor text into the actual textarea
+    CKEDITOR.on('instanceReady', function () {
+          $.each(CKEDITOR.instances, function (instance) {
+              CKEDITOR.instances[instance].document.on("keyup", CK_jQ);
+              CKEDITOR.instances[instance].document.on("paste", CK_jQ);
+              CKEDITOR.instances[instance].document.on("keypress", CK_jQ);
+              CKEDITOR.instances[instance].document.on("blur", CK_jQ);
+              CKEDITOR.instances[instance].document.on("change", CK_jQ);
+          });
+      });
+    function CK_jQ() {
+      for (instance in CKEDITOR.instances) {
+          CKEDITOR.instances[instance].updateElement();
+      }
+      // revalidate
+      $('#product-form').valid();
+    }
+
+    // Validate on submit
+    $("#product-form").validate({
+      ignore: [],
+      debug: false,
+      rules: {
+        "product_category": {
+          required: true,
+        },
+        "name_vi": {
+          required: true,
+        },
+        "name_en": {
+          required: true,
+        },
+        "vi-des":{
+          required: true
+        },
+        "en-des":{
+          required: true
+        },
+      },
+      messages: {
+        "product_category": {
+          required: "Bắt buộc nhập danh mục sản phẩm",
+        },
+        "name_vi": {
+          required: "Bắt buộc nhập tên sản phẩm (Tiếng Việt)",
+        },
+        "name_en": {
+          required: "Bắt buộc nhập tên sản phẩm (Tiếng Anh)",
+        },
+        "en-des": {
+          required: "Bắt buộc nhập mô tả sản phẩm (Tiếng Anh)",
+        },
+        "vi-des": {
+          required: "Bắt buộc nhập mô tả sản phẩm (Tiếng Việt)",
+        },
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+        if ($(element).attr("name") == 'name_vi') $('[href="#vi-tab"]').addClass("card-danger")
+        if ($(element).attr("name") == 'name_en') $('[href="#en-tab"]').addClass("card-danger")
+        if ($(element).attr("name") == 'number_images_hidden') $('#images').addClass("red-border")
+        if ($(element).attr("name") == 'vi-des') $('#cke_id_vi-des').addClass("red-line-border")
+        if ($(element).attr("name") == 'en-des') $('#cke_id_en-des').addClass("red-line-border")
+
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+        if ($(element).attr("name") == 'name_vi') $('[href="#vi-tab"]').removeClass("card-danger")
+        if ($(element).attr("name") == 'name_en') $('[href="#en-tab"]').removeClass("card-danger")
+        if ($(element).attr("name") == 'number_images_hidden') $('#images').removeClass("red-border")
+        if ($(element).attr("name") == 'vi-des') $('#cke_id_vi-des').removeClass("red-line-border")
+        if ($(element).attr("name") == 'en-des') $('#cke_id_en-des').removeClass("red-line-border")
+      },
+      submitHandler: function(form) {
+        // call ajax
+        let data = getData();
+
+        if (data['models'].length == 0) {
+          toastr.error('Vui lòng nhập giá sản phẩm!')
+          return
+        }
+
+
+        let url = `/${window.location.pathname.split('/')[1]}/admin/product/store`;
+        $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            if (data.success) {
+              toastr.success('Tạo sản phẩm thành công')
+              window.location = `/${window.location.pathname.split('/')[1]}/admin/product`
+            }
+          }
+        })
+      }
+    });
+
+
+    function getData() {
+      result = {}
+      result['product_category'] = $('[name="product_category"]').val()
+      result['models'] = getModel()
+      result['images'] = [...images]
+      result['name_vi'] = $('[name="name_vi"]').val()
+      result['name_en'] = $('[name="name_en"]').val()
+      result['en_des'] = CKEDITOR.instances['id_en-des'].getData()
+      result['vi_des'] = CKEDITOR.instances['id_vi-des'].getData()
+      result['is_hide_price'] = $('#is-hide-price:checked').length != 0 ? 1 : 0
+      return result;
+    }
+
+    // register event
+    $('.submit-btn').click(function(){
+      $('#product-form').submit();
+    })
+
+    function addNewAttr(){
+        let newRow = $('<div/>', {
+          class: "row",
+        })
+
+        let weightCol = $('<div/>', {
+            class: "form-group col",
+        })
+
+        let weightAttr = $('<input>', {
+            type: "text",
+            name: "weight",
+            class: "weight-attr form-control",
+        })
+
+        let priceCol = $('<div/>', {
+            class: "form-group col",
+        })
+
+        let priceAttr = $('<input>', {
+            type: "text",
+            name: "price",
+            class: "price-attr form-control",
+        })
+
+        let btnCol = $('<div/>', {
+            class: "form-group col col-delete",
+        })
+
+        let removeBtn = $('<button type="button" name="delete" class="form-control btn btn-danger btn-remove-attr" type="button"> <i class="fas fa-times-circle"></i> </button>')
+
+        weightCol.append(weightAttr)
+        priceCol.append(priceAttr)
+        btnCol.append(removeBtn)
+
+        newRow.append(weightCol)
+        newRow.append(priceCol)
+        newRow.append(btnCol)
+
+        $('#model-attr').append(newRow)
+    }
+
+    $("#addNewAttr").on('click', addNewAttr);
+    
+
+    $(document).on('click', ".btn-remove-attr", function(){
+      let removeRow = $(this).parents().closest(".row")
+      if ($('.btn-remove-attr').length <= 1) {
+        $("#alert-no-price-product-modal").modal('show')
+      } else {
+        removeRow.remove()
+      }
+    })
+
+    $("#continue-delete").click(function(){
+      $('.btn-remove-attr').parents().closest(".row").remove()
+      $('.no-price').removeClass('d-none')
+      $("#alert-no-price-product-modal").modal('hide')
+    })
+
+
+</script>
+{% endblock script %}

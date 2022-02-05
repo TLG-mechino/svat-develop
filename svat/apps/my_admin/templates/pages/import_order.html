@@ -1,0 +1,474 @@
+{% extends 'layout/base.html' %}
+
+{% load static %}
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+.select2-dropdown.select2-dropdown--below, .select2-dropdown.select2-dropdown--below input{
+  background: #e9ecef;
+}
+
+</style>
+{% endblock css %}
+
+{% block content %}
+<style>
+  .dataTables_filter{
+    float: left !important;
+  }
+  table.table-fixed { table-layout:fixed; }
+  table.table-fixed td { overflow: hidden; }
+
+  .select2-container .select2-selection--single {
+    height: auto;
+  }
+  .select2-selection--single {
+    overflow: hidden;
+    text-overflow: ellipse;
+    width: 100%;
+  }
+  .select2-selection { overflow: hidden; }
+  .select2-selection__rendered { white-space: nowrap !important; word-break: break-all !important}
+  /* table general */
+
+  td{
+    padding: 0.25rem!important;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  td:first-child{
+    width: 1%;
+    text-align: center;
+  }
+
+  .users {
+    table-layout: fixed;
+  }
+  .add-row-btn {
+    border: 3px dashed #005cbf;
+    color: #005cbf;
+    padding: 0 !important;
+    height: 40px;
+  }
+  .add-row-btn:hover {
+    border: 3px solid #005cbf;
+    color: #fff;
+    background: #005cbf;
+  }
+  input {
+    height: 40px;
+  }
+</style>
+
+<!-- Modal Import Order -->
+<div class="modal fade" id="createImportOrder" role="dialog" aria-labelledby="createImportOrderLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content" style="max-height:90vh">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createImportOrderLabel">Thêm mới</h5>
+        <br>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div style=" overflow-y: scroll;overflow-x: hidden;" class="modal-body">
+        <div class="alert alert-danger" id="alertCreateError" role="alert" style="display:none">
+          <span id="createErrorMsg"></span>
+        </div>
+
+        <table  class="table table-bordered table-hover table-fixed">
+        </table>
+
+        <table id="add_list_product" class="table table-bordered table-hover table-fixed" >
+          <thead>
+            <tr>
+              <th class="w-50">Sản phẩm</th>
+              <th class="w-45"><span class="w-35 d-inline-block">Tồn kho</span><span>Khối lượng<span><span style="float:right">Số lượng</span></th>
+              <th class="w-5"></th>
+            </tr>
+          </thead>
+          <tbody id="body_list_product">
+
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"><button type="button" class="btn p-2 btn-block add-row-btn" ><h3>+</h3></button></td>
+            </tr>
+          </tfoot>
+          
+        </table>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy bỏ</button>
+        <button type="button" class="btn btn-primary" id="confirmCreate">Tạo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal View ImportOrder Detail-->
+<div class="modal fade" id="viewImportOrder" tabindex="-1" role="dialog" aria-labelledby="viewImportOrderLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewImportOrderLabel">Thông tin chi tiết</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" id="alertEditError" role="alert" style="display:none">
+          <span id="editErrorMsg"></span>
+        </div>
+        <form>
+          {% csrf_token %}
+            <table id="list_product" class="table table-bordered table-hover table-fixed" style="width:100%">
+              <thead>
+                  <tr>
+                      <th>Mã - Tên</th>
+                      <th>Giá</th>
+                      <th>Khối lượng</th>
+                      <th>Số lượng nhập</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close_product_list" data-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Preview ImportUser -->
+<div class="modal fade" id="previewImportOrder" tabindex="-1" role="dialog" aria-labelledby="previewImportOrderLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content" style="width: 100%;height: 60vh;margin-left: 5vh;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="previewImportOrderLabel">Phiếu nhập kho</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div style="padding-right: 2rem;padding-left: 1rem;">
+        <table  class="table table-bordered table-hover table-fixed">
+          <thead>
+            <tr style="width:100%">
+                <th style="width:30%">Mã sản phẩm</th>
+                <th style="width:35%">Sản phẩm</th>
+                <th style="width:35%">Số lượng </th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="modal-body" style="overflow-y: scroll;overflow-x: hidden;">
+        <div class="alert alert-danger" id="alertCreateError" role="alert" style="display:none">
+          <span id="createErrorMsg"></span>
+        </div>
+
+        <table id="previewProduct" class="table table-bordered table-hover table-fixed" style="width:100%">
+          <!-- <thead>
+              <tr style="width:100%">
+                  <th style="width:30%">Mã sản phẩm</th>
+                  <th style="width:35%">Sản phẩm</th>
+                  <th style="width:35%">Số lượng </th>
+              </tr>
+            </thead> -->
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancel_list_product" data-dismiss="modal">Hủy bỏ</button>
+        <button type="button" class="btn btn-primary" id="confirmImportOrder">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content container-fluid" style="padding: 1rem">
+    
+  <div class="row p-2">
+    <div class="col"><h3>Danh sách nhập kho</h3></div>
+    <div class="col"></div>
+  </div>
+  <div class="card card-primary card-outline">
+    <div class="card-body">
+      <button type="button" class="btn btn-primary btn-sm create-btn">Thêm mới</button>
+      <table id="users" class="table table-bordered table-hover table-fixed" style="width:100%">
+        <thead >
+            <tr>
+                <th class="w-1 text-nowrap text-center">ID</th>
+                <th>Ngày tạo</th>
+                <th>Nhân viên tạo</th>
+                <th class="w-10">Thao tác</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+    <div id="limit_row" class="{{len}}"></div>
+</div>
+
+
+{% endblock content %}
+{% block script %}
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+
+  $(document).ready(async function() {
+    let editingRow = null
+    let deletingRow = null
+    var current_length=0
+    var raw_data = []
+    var limit_row= document.getElementById("limit_row").getAttribute("class");
+    limit_row=parseInt(limit_row)
+
+    await $.get("/admin/GetAllProduct", function(data){ 
+      raw_data = data.results
+    });
+    $(".js-select2").select2({
+      data: raw_data
+    })
+
+    $('.add-row-btn').on('click', function(e){
+      // Init select data
+      const data = calculateRawData();
+      if (data.length == 0) return;
+
+       // Append row
+       let html = ""  
+        html += `<tr data-id-row="${data[0].id}">`
+        html += '<td style="width: 40%"><select class="js-select2 form-control select2-hidden-accessible" style="width: 100%"></select></td>'
+        html += '<td>'
+          html += '<div class="row w-100 m-0">'
+            html += '<input type="hidden" class="id">'
+            html += '<input type="number" class="col form-control stock text-center mr-2" disabled>'
+            html += '<input type="number" class="col form-control weight text-center mr-2" disabled>'
+            html += '<input type="number" class="col form-control quantity text-right" min="0">'
+          html += '</div>'
+        html += '</td>'
+        html += '<td><button type="button" class="btn btn-danger btn-sm del-row"><i class="fa fa-trash" aria-hidden="true"></i></button></td>'
+      html += '</tr>'
+      $('#body_list_product').append(html)
+
+      $(".js-select2").select2({ data })
+
+      // Bind Event
+      rebindEvent();
+      // remove `this` option of other select
+      $(`.js-select2 option[value='${data[0].id}']`).not(`tr[data-id-row="${data[0].id}"] option`).remove()
+      // Manual trigger event
+      $('.js-select2').trigger('change'); 
+    })
+
+    $('.add-row-btn').trigger('click')
+
+    function rebindEvent() {
+      $(".js-select2").unbind('change.svat_custom')
+      $(".del-row").unbind('click.svat_custom')
+
+      bindJsSelect2();
+      bindDeleteRow();
+    }
+
+
+    function bindJsSelect2() {
+      var lastOption = -1
+      $('.js-select2').on('select2:selecting', function (e) {
+          lastOption = this.value
+      });
+
+      $('.js-select2').bind('change.svat_custom', function(e){
+        // Get models
+        let selected_product = raw_data.filter(item => item.id == $(this).val())[0]
+        models = JSON.parse(selected_product.models)
+
+        // Change html 
+        let html = ""
+        for (model of models) {
+          html += `<div class="row w-100 m-0 mb-2">`
+          html += `<input type="hidden" class="id" value="${model.id}">`
+          html += `<input type="number" class="col form-control stock text-center mr-2" value="${model.quantity}" disabled>`
+          html += `<input type="text" class="col form-control weight text-center mr-2" value="${model.weight}" disabled>`
+          html += `<input type="number" class="col form-control quantity text-right" min="0" value="0">`
+          html += `</div>`
+        }
+        $(this).parent().parent().find('td:nth-child(2)').html(html)
+        $(this).parent().parent().attr('data-id-row', selected_product.id)
+
+        // remove `this` option of other select
+        $(`.js-select2 option[value='${selected_product.id}']`).not(`tr[data-id-row="${selected_product.id}"] option`).remove()
+        const return_product = raw_data.filter(item => item.id == lastOption)[0]
+        if (return_product) {
+          $(".js-select2").append(`<option value="${return_product.id}">${return_product.text}</option>`)
+        }
+      })
+    }
+
+
+    function bindDeleteRow () {
+      $('.del-row').bind('click.svat_custom', function () {
+        const id = $(this).parent().parent().attr('data-id-row')
+
+        const deleted_product = raw_data.filter(item => item.id == id)[0]
+        $(".js-select2").append(`<option value="${deleted_product.id}">${deleted_product.text}</option>`)
+
+        // Remove row 
+        $(this).parent().parent().remove()
+      })
+    }
+
+    // init
+    bindJsSelect2();
+    bindDeleteRow();
+    
+
+    function calculateRawData () {
+      let listProductRegister = []
+      for (item of $('.js-select2')) {
+        listProductRegister.push(item.value)
+      }
+
+      return raw_data.filter(item => listProductRegister.indexOf(item.id+"") == -1)
+    }
+
+
+    function sendRequest(method, endpoint, data){
+      return new Promise((resolve, reject) => {
+        let langCode = window.location.pathname.split('/')[1]
+        let csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
+        fetch(`\/${langCode}${endpoint}`,
+          {method: method, body: JSON.stringify(data), headers: {"X-CSRFTOKEN": csrftoken}}
+        )
+          .then(data => resolve(data.json()))
+          .catch(err => reject(err))
+      })
+    }
+
+    function addLeadingZero(strDate){
+      return ('0' + strDate.toString()).slice(-2)
+    }
+
+    function formatDate(date, includedTime=false){
+        let dateStr = `${addLeadingZero(date.getUTCDate())}/${addLeadingZero(date.getUTCMonth() + 1)}/${date.getUTCFullYear()}`
+        let timeStr = ''
+
+        if(includedTime === true){
+            timeStr = `${addLeadingZero((date.getUTCHours() + 7) % 24)}:${addLeadingZero(date.getUTCMinutes())}:${addLeadingZero(date.getUTCSeconds())}`
+        }
+        
+        return `${dateStr} ${timeStr}`
+    }
+
+    var tableUsers = $('#users').DataTable({
+        "ajax": "/admin/GetAllImportOrder",
+        "bLengthChange": false,
+        "columns": [
+            { "data": "id" },
+            {
+              "data": "created",
+              "render": function(data, type, row, meta){
+                if(data === null) return '';
+                let date = new Date(data);
+                return formatDate(date, true);
+              }
+            },
+            { "data": "user" },
+            {
+              "data": "actions",
+              "render": function ( data, type, row, meta ) {
+                  return '<button type="button" class="btn btn-primary view-detail">Xem chi tiết</button>'
+              }
+            }
+        ]
+    });
+
+    
+    // Event Controller
+
+    $('.create-btn').on('click', function(e){
+
+    })
+
+    $(document).on('click', '.view-detail', function(e){
+      viewRow = $(this).parents('tr')[0]
+      viewImportOrder = tableUsers.row(viewRow).data();
+      let viewDetail = {
+        id: viewImportOrder.id,
+      }
+      sendRequest('POST', '/admin/ViewDetail', viewDetail)
+        .then(data => {
+          $('#list_product tbody').html("")
+          if (data.success) {
+            let html = "";
+            for (item of data.data) {
+              html += `<tr>`;
+              html += `<td class="text-truncate">${item.name}</td>`;
+              html += `<td>${item.price}</td>`;
+              html += `<td>${item.weight}</td>`;
+              html += `<td>${item.quantity}</td>`;
+              html += '</tr>';
+            }
+            $('#list_product tbody').append(html)
+            $('#viewImportOrder').modal('show')
+          }
+        })
+          
+    })
+
+
+    $(document).on('click', '#confirmCreate', function(e){
+      // prepare data
+      result = []
+      for (item of $('#body_list_product tr')) {
+        for (model of $(item).find('.row')) {
+          let product_model = $(model).find('.id').val()
+          let quantity = $(model).find('.quantity').val()
+          if (quantity == 0) continue;
+          let tmp = { product_model, quantity }
+          result.push(tmp)
+        }
+      }
+      // Call ajax                                                
+
+      const url = `{% url 'import_order.post' %}`;
+      $.ajax({
+        url,
+        type: "POST",
+        headers: {
+          "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val(),
+        },
+        dataType: "json",
+        processData: false,
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(result),
+        success: async function (data) {
+          if (data.success) {
+            $('#createImportOrder').modal('hide')
+            tableUsers.ajax.reload()
+            await $.get("/admin/GetAllProduct", function(data){ 
+              raw_data = data.results
+            });
+            // clear table data 
+            $('#body_list_product').html("")
+            $('.add-row-btn').trigger('click')
+          } else {
+            toastr.error(data.message)
+          }
+        },
+      });
+    })
+    
+    $('.create-btn').click(function(){
+      $('#createImportOrder').modal('show')
+    })
+
+  })
+</script>
+
+{% endblock script %}

@@ -1,0 +1,115 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Bài viết{% endblock title %}
+{% block css %}
+<style>
+.article-category-group {
+    width: 100%;
+    border: 1px solid #7fad39;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.article-category-group ul {
+    margin: 0;
+    padding: 1rem;
+    color: black;
+    padding-bottom: 0.5rem;
+}
+
+.article-category-group ul li a{
+    color: black;
+    font-weight: bold;
+}
+.article-category-group ul li{
+    list-style-type: none;
+    color: black;
+    margin-bottom: 0.5rem;
+}
+
+.article-category-header {
+    background: #7fad39;
+    font-weight: bold;
+    font-size: 20px;
+    color: white;
+    height: 3rem;
+    padding: 0.5rem 0 0 0.75rem;
+    text-align: left;
+}
+
+
+</style>
+{% endblock css %}
+{% block content %}
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'user/global/images/bg-breadcrumb.png' %}" style="background-image: url(&quot;{% static 'user/global/images/bg-breadcrumb.png' %}&quot;);">
+    <div class="container h-100">
+        <div class="text-center h-100">
+            <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+                <h2>{% trans "article-category-title" %}</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="container-fluid w-75 bg-white mt-4 p-4">
+    <div class="row pt-3 pb-2">
+        <div class="pl-0 col-12 category">
+            <h5 class="font-weight-bolder text-uppercase">
+                {% trans "product-category-label" %}:
+                {% if category is None %}
+                    {% trans "product-category-option" %}
+                {% elif request.LANGUAGE_CODE == 'vi' %}
+                    {{category.name_vi}}
+                {% else %}
+                    {{category.name_en}}
+                {% endif %}
+            </h5>
+        </div>
+    </div>
+    <div class="row">
+      <div {% if request.is_mobile %} class="product-content col-12" {% else %} class="product-content col-8" {% endif %}>
+            <div class="row">
+                {% for article in articles %}
+                    <div class="col-6 p-0 {% if request.is_mobile %}border{% endif %}">
+                        {% include 'user/components/article.html' with article=article %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% if not request.is_mobile %}
+        <div class="col-4">
+            <div class="article-category-group">
+                <div>
+                    <div class="article-category-header">{% trans "product-category-label" %}</div>
+                    <ul>
+                        {% for item in categories%}
+                            <li><a href="articles?category={{item.id}}">
+                                {% if request.LANGUAGE_CODE == "vi" %}
+                                    {{item.name_vi}}
+                                {% else %}
+                                    {{item.name_en}}
+                                {% endif %}
+                            </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div> 
+
+            <div class="most-view-article">
+                <h4 class="font-weight-bold mt-4 mb-2">{% trans "article-most-view" %}</h4>
+                <div class="row">
+                    {% for article in most_view_articles %}
+                        <div class="col-12">
+                            {% include 'user/components/article.html' with article=article %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,20 @@
+{% load humanize %}
+<div class="featured__item article-component p-3" role="button">
+
+    <input type="hidden" value="{{article.id}}">
+    <div  class="featured__item__pic set-bg" data-setbg="/media/{{article.thumbnail.file_path}}" style="background-image: url(&quot;/media/{{article.thumbnail.file_path}}&quot;);">
+    </div>
+
+    <div class="featured__item__text text-left">
+        <small class="text-secondary"><i class="fa fa-calendar-o"></i> {{article.post_at | date:"d/m/Y H:i:s"}}</small>
+    
+        <a href="{% url 'user.detail_article' id=article.id %}" class="font-1-25 text-dark show-3line">
+        {% if request.LANGUAGE_CODE == "vi" %}
+            {{ article.article_language_vi.title }}
+        {% else %}
+            {{ article.article_language_en.title }}
+        {% endif %}
+        </a>
+    </div>
+</div>
+

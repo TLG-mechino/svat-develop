@@ -1,0 +1,46 @@
+<div class="blog__sidebar">
+  <div class="blog__sidebar__item">
+    <h4 class="mb-0 text-truncate">Danh mục sẩn phẩm</h4>
+    <ul>
+      <li class="{% if active is None %} active {% endif %}"><a href="/product " >Tất cả</a></li>
+      {% for category in categories %}
+        <li class="{% if active is not None and active.id == category.id %} active {% endif %}"><a href="/product?category={{category.id}}">
+            {% if request.LANGUAGE_CODE == 'vi' %}
+                {{ category.name_vi }}
+            {% else %}
+                {{ category.name_en }}
+            {% endif %}
+         </a></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% if showArticles  %}
+  <div class="blog__sidebar__item">
+    <h4 class="mb-1 text-truncate">Bài viết mới nhất</h4>
+    <div class="blog__sidebar__recent">
+
+      {% for article in newest_articles %}  
+      <a href="/vi/article/{{article.id}}" class="blog__sidebar__recent__item">
+        <div class="blog__sidebar__recent__item__pic">
+          <img src="/media/{{article.thumbnail.file_path}}">
+        </div>
+        <div class="blog__sidebar__recent__item__text">
+          <h6>
+            {% if request.LANGUAGE_CODE == 'vi' %}
+                {{ article.article_language_vi.title }}
+            {% else %}
+                {{ article.article_language_en.title }}
+            {% endif %}
+          </h6>
+          <span><i class="fa fa-calendar" aria-hidden="true"></i> {{ article.post_at | date:"d/m/Y H:i:s"}}</span>
+        </div>
+      </a>
+      {% endfor %}
+
+    </div>
+  </div>
+  {% endif  %}
+
+</div>
+

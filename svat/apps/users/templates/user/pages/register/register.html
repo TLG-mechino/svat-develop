@@ -1,0 +1,202 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block css %}
+<style>
+.form-control {
+    background: #fff;
+    outline: none;
+    padding: 1.25rem;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    width: 100%;
+    border: 1px solid #d0d0d0;
+    border-radius: 0;
+}
+.btn-submit {
+  height: 3.5rem
+}
+
+label {
+  font-weight: bold
+}
+</style>
+{% endblock css %}
+{% block content %}
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'user/global/images/bg-breadcrumb.png' %}" style="background-image: url(&quot;{% static 'user/global/images/bg-breadcrumb.png' %}&quot;);">
+  <div class="container h-100">
+      <div class="text-center h-100 ">
+        <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+          <h2>{% trans "register-header" %}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="container pb-5 pt-5 {% if not request.is_mobile  %}w-40{% endif %}">
+  <form id="register-form" action="{% url 'user.register' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputEmail1">{% trans "name" %}</label>
+        <input type="text" class="form-control" id="name" name="name" aria-describedby="emailHelp" placeholder="{% trans "name" %}">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">Email</label>
+        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Email">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">{% trans "phone-number" %}</label>
+        <input type="text" class="form-control" id="phone_number" name="phone_number" aria-describedby="emailHelp" placeholder="{% trans "phone-number" %}">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">{% trans "password" %}</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="{% trans "password" %}">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">{% trans "re-password" %}</label>
+        <input type="password" class="form-control" id="re_password" name="re_password" placeholder="{% trans "re-password" %}">
+    </div> 
+    <button type="submit" class="btn flat-btn w-50 m-auto d-block btn-submit ">
+      <svg class="d-none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  width="25px" height="25px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        <g>
+          <path d="M50 15A35 35 0 1 0 74.74873734152916 25.251262658470843" fill="none" stroke="#ffffff" stroke-width="12"></path>
+          <path d="M49 3L49 27L61 15L49 3" fill="#ffffff"></path>
+          <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="2.380952380952381s" values="0 50 50;360 50 50" keyTimes="0;1"></animateTransform>
+        </g>
+      </svg>&nbsp;
+      <span>{% trans "register" %}</span>
+    </button>
+    </form>
+</div>
+{% endblock content %}
+
+{% block script %}
+<!-- jquery-validation -->
+<script src="{% static 'admin-lte/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script>
+$(document).ready(function(){
+
+    jQuery.validator.addMethod("phone_number", function(value, element) {
+      return value.match(/^0\d{9,10}$/)
+    }, '{% trans "phone-number-validate" %}');
+
+    jQuery.validator.addMethod("password_rule", function(value, element) {
+      return value.match(/^\w{8,256}$/)
+    },  '{% trans "password-validate" %}');
+
+    // Validate on submit
+    $("#register-form").validate({
+      ignore: [],
+      debug: false,
+      rules: {
+        "name": {
+          required: true,
+        },
+        "email": {
+          required: true,
+          email: true
+        },
+        "phone_number": {
+          required: true,
+          phone_number: true
+        },
+        "password": {
+          required: true,
+          password_rule: true
+        },
+        "re_password":{
+          required: true,
+          equalTo: "#password"
+        },
+      },
+      messages: {
+        "name": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "name" %}'),
+        },
+        "email": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "email" %}'),
+          email: '{% trans "email-validate" %}',
+        },
+        "phone_number": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "phone-number" %}'),
+        },
+        "password": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "password" %}'),
+        },
+        "re_password":{
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "re-password" %}'),
+          equalTo : '{% trans "re-password-validate" %}'
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      },
+      submitHandler: async function(form) {
+        // call ajax
+        let data = getData();
+        let url = `/${window.location.pathname.split('/')[1]}/register`;
+
+        $('button[type="submit"] svg').removeClass('d-none');
+        $('button[type="submit"]').attr('disabled', 'true');
+        await $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            if (data.success) {
+              window.location = `register/success?email=${$("#email").val()}`
+              return
+            } else {
+              for (item in data.errors[0]) {
+                // 500
+                if (item == "server") { toastr.error(data.errors[0][item]); return; }
+
+                // add invalid border to input
+                $(`[name="${item}"]`).addClass('is-invalid');
+                // Add error span
+                if ($('.invalid-feedback.cus-span').length == 0) {
+                  error = $('<span />').addClass('invalid-feedback').addClass('cus-span').html(data.errors[0][item]);
+                  $(`[name="${item}"]`).closest('.form-group').append(error);
+                } else {
+                  $('.invalid-feedback.cus-span').html(data.errors[0][item])
+                }
+              }
+            }
+          }
+        });
+        $('button[type="submit"] svg').addClass('d-none');
+        $('button[type="submit"]').removeAttr('disabled');
+      }
+    });
+
+    function getData() {
+        let result = {};
+        result['name'] = $("#name").val()
+        result['email'] = $("#email").val()
+        result['phone_number'] = $("#phone_number").val()
+        result['password'] = $("#password").val()
+        return result;
+    }
+
+    $("#register-form").submit(function(e) {
+      e.preventDefault();
+    })
+})
+</script>
+{% endblock script %}

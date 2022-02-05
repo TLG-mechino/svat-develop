@@ -1,0 +1,112 @@
+{% extends 'user/layout/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}Sản phẩm{% endblock title %}
+{% block css %}
+<style>
+.sort-label {
+    cursor: pointer;
+}
+</style>
+{% endblock css %}
+{% block content %}
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'user/global/images/bg-breadcrumb.png' %}" style="background-image: url(&quot;{% static 'user/global/images/bg-breadcrumb.png' %}&quot;);">
+    <div class="container h-100">
+        <div class="text-center h-100">
+            <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+                <h2>{% trans "product-category-title" %}</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container-fluid w-80 bg-white mt-4">
+    <div class="row">
+      {% if not request.is_mobile %}
+      <div class="col-3">
+         {% comment %}side bar {% endcomment %}
+          {% include 'user/components/sidebar.html' with categories=categories active=category %}
+      </div>
+      {% endif %}
+      <div {% if request.is_mobile %} class="col-12" {% else %} class="col-9" {% endif %}>
+        <div class="row product-list">
+
+            {% comment %}category word {% endcomment %}
+            <div class="col-8 category pl-1">
+            {% if request.GET.search_keyword %}
+                <h5>
+                  <span class="font-weight-bold">{%  trans "product-category-keyword"%}:</span> {{request.GET.search_keyword}}
+                </h5>
+            {% else %}
+                <h5>
+                    <span class="font-weight-bold">{% trans "product-category-label" %}:</span>
+                    {% if category is None %}
+                        {% trans "product-category-option" %}
+                    {% elif request.LANGUAGE_CODE == 'vi' %}
+                        {{category.name_vi}}
+                    {% else %}
+                        {{category.name_en}}
+                    {% endif %}
+                </h5>
+            {% endif%}
+            </div>
+
+            <div class="col-4 sort-group text-right">
+                    <label href="#"  class="dropdown-toggle sort-label" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {% if not request.is_mobile %}
+                      <span class="font-weight-bold">{% trans "product-sort-label" %}:</span>
+                        {% if sort is None or sort == "lastest"%}
+                            {% trans "product-sort-option-01" %}
+                        {% elif sort == "best-seller"%}
+                            {% trans "product-sort-option-02" %}
+                        {% elif sort == "price-asc"%}
+                            {% trans "product-sort-option-03" %}
+                        {% elif sort == "price-desc"%}
+                            {% trans "product-sort-option-04" %}
+                        {% endif %}
+                      {% else %}
+                        Sắp xếp 
+                      {% endif %}
+                    </label>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <button class="dropdown-item sort-btn" data-sort="lastest" type="button">{% trans "product-sort-option-01" %}</button>
+                        <button class="dropdown-item sort-btn" data-sort="best-seller" type="button">{% trans "product-sort-option-02" %}</button>
+                        <button class="dropdown-item sort-btn" data-sort="price-asc" type="button">{% trans "product-sort-option-03" %}</button>
+                        <button class="dropdown-item sort-btn" data-sort="price-desc" type="button">{% trans "product-sort-option-04" %}</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-content">
+              <div class="row" {% if request.is_mobile %} style="max-width: 100%; margin: 0" {% endif %}>
+                {% for product in products %}
+                <div {% if request.is_mobile %} class="col-6 p-0 border" {% else %} class="col-lg-3 p-0" {% endif %}>
+                  {% include 'user/components/product.html' with product=product %}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+$(document).ready(function(){
+
+    // Handle sort 
+    $(".sort-btn").click(function(){
+        let url = new URL(window.location.href);
+        let params = new URLSearchParams(url.search);
+        params.set('sort', $(this).data('sort'));
+        href = window.location.pathname + '?' + params.toString(); 
+        window.location = href
+    })
+
+})
+</script>
+{% endblock script %}
+

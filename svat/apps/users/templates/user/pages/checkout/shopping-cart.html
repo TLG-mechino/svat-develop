@@ -1,0 +1,251 @@
+{% extends 'user/layout/base.html' %}
+
+{% load static %}
+{% load i18n %}
+{% block title %}Giỏ hàng{% endblock title %}
+{% load humanize %}
+
+{% block css %}
+{% endblock css %}
+{% block content %}
+<!-- breadcrumb -->
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'user/global/images/bg-breadcrumb.png' %}"
+    style="background-image: url(&quot;{% static 'user/global/images/bg-breadcrumb.png' %}&quot;);">
+    <div class="container h-100">
+        <div class="text-center h-100">
+            <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+                <h2>{% trans "shopping-cart-header" %}</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container-fluid w-80 bg-white mt-4 {% if request.is_mobile %}p-0{% endif %}">
+    <section class="shoping-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shoping__cart__table">
+
+                      {% if not request.is_mobile %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="shoping__product">{% trans "shopping-cart-product" %}</th>
+                                    <th>{% trans "shopping-cart-price" %}</th>
+                                    <th>{% trans "shopping-cart-quantity" %}</th>
+                                    <th>{% trans "shopping-cart-total" %}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    {% comment %}desktop{% endcomment %}
+                                    <td class="shoping__cart__item row">
+                                      <input type="hidden" class="product-id-hidden" value="{{product.product.id}}" data-model-id="{{product.product_model.id}}">
+                                        <img class="col-2 fixed-img-thumbnail m-0" src="/media/{{product.product.product_thumbnail}}" alt="product_img">
+                                        
+                                        <h5 class="col-10 d-flex align-items-center flex-wrap">
+                                        {% if request.LANGUAGE_CODE == "vi" %}
+                                            {{ product.product.product_language_vi.name }}
+                                        {% else %} 
+                                            {{ product.product.product_language_en.name }}
+                                        {% endif %}
+                                        </h5>
+                                    </td>
+                                    <td class="shoping__cart__price" data-price="{{product.product_model.price | floatformat:0 }}">
+                                        {{product.product_model.price | floatformat:0 }}đ
+                                    </td>
+                                    <td class="shoping__cart__quantity">
+                                        <div class="quantity">
+                                            <div class="pro-qty">
+                                                <span class="dec qtybtn">-</span>
+                                                <input type="text" value="{{product.quantity}}">
+                                                <span class="inc qtybtn">+</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="shoping__cart__total">
+                                        {% widthratio product.product_model.price 1 product.quantity as total_value %} 
+                                        {{ total_value | intcomma }}đ
+                                    </td>
+                                    <td class="shoping__cart__item__close">
+                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512" class="svg-inline--fa fa-times fa-w-11 fa-2x delete-product-cart"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" class=""></path></svg>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% else %}
+                        {% comment %}mobile{% endcomment %}
+                        {% for product in products %}
+
+                        <div class="shoping__cart__item row w-100 mb-3 ">
+                          <input type="hidden" class="product-id-hidden" value="{{product.product.id}}" data-model-id="{{product.product_model.id}}">
+                          <img class="col-4 p-0 fixed-img-thumbnail m-0" src="/media/{{product.product.product_thumbnail}}" alt="product_img">
+
+                          <div class="col-8 pr-0 d-flex align-items-center flex-wrap">
+                            <h5 class="show-1line w-100 font-weight-bold" style="font-size: 1rem">
+                              {% if request.LANGUAGE_CODE == "vi" %}
+                              {{ product.product.product_language_vi.name }}
+                              {% else %} 
+                              {{ product.product.product_language_en.name }}
+                              {% endif %}
+                            </h5>
+                            <br>
+
+                            <span class="shoping__cart__price" data-price="{{product.product_model.price | floatformat:0 }}">
+                              Đơn giá:&nbsp;&nbsp; {{product.product_model.price | floatformat:0 }}đ
+                            </span>
+                            <br>
+
+                            <span class="shoping__cart__quantity">
+                              <div class="quantity text-nowrap">
+                                Số lượng:
+                                <div class="pro-qty" style="transform: scale(0.7); width: auto">
+                                  <span class="dec qtybtn">-</span>
+                                  <input type="text" value="{{product.quantity}}">
+                                  <span class="inc qtybtn">+</span>
+                                </div>
+                              </div>
+                            </span>
+                            <br>
+
+                            <span class="shoping__cart__total">
+                              {% widthratio product.product_model.price 1 product.quantity as total_value %} 
+                              Tổng tiền: {{ total_value | intcomma }}đ
+                            </span>
+                            <svg style="position: absolute; right: 0; bottom: 0; width: 14px;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512" class="svg-inline--fa fa-times fa-w-11 fa-2x delete-product-cart"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" ></path></svg>
+                          </div>
+                        </div>
+                        <hr>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                </div>
+                <div class="col-lg-6">
+                    <div class="shoping__checkout">
+                        <h5>{% trans "shopping-cart-total-cart" %}: </h5>
+                        <ul class=" p-0">
+                            <li class="m-0">{% trans "shopping-cart-total" %} <span>{{total | floatformat:0}}đ</span></li>
+                        </ul>
+                        {% csrf_token %}
+                        <a href="{% url 'user.checkout' %}" class="primary-btn go-to-checkout-btn">{% trans "shopping-cart-create-bill" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}
+{% block script %}
+<script>
+  $(document).ready(function () {
+    $('.inc').on('click', function () {
+      let currentQuantity = parseInt($(this).parent().children('input').val());
+      let currentPrice = parseInt($(this).parent().parent().parent().parent().children(".shoping__cart__price").data('price').replace(/\./, ''));
+      let totalElement = $(this).parent().parent().parent().parent().children(".shoping__cart__total");
+      let newTotal = (currentQuantity + 1) * currentPrice;
+
+      $(this).parent().children('input').val(currentQuantity + 1);
+      totalElement.html(`{% if request.is_mobile %}Tổng tiền: {% endif %}${formatNumber(newTotal)}đ`);
+
+      handleChangeQuantity(currentPrice);
+    })
+
+    $('.dec').on('click', function () {
+      let currentQuantity = parseInt($(this).parent().children('input').val())
+      let currentPrice = parseInt($(this).parent().parent().parent().parent().children(".shoping__cart__price").data('price').replace(/\./, ''));
+      let totalElement = $(this).parent().parent().parent().parent().children(".shoping__cart__total");
+      let newTotal = (currentQuantity - 1) * currentPrice;
+
+      if (currentQuantity > 1) {
+        $(this).parent().children('input').val(currentQuantity - 1);
+        totalElement.html(`{% if request.is_mobile %}Tổng tiền: {% endif %}${formatNumber(newTotal)}đ`);
+        handleChangeQuantity(currentPrice*-1);
+      }
+    })
+
+    function formatNumber(str){
+      str += '';
+      x = str.split('.');
+      x1 = x[0];
+      x2 = x.length > 1 ? ',' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + '.' + '$2');
+      }
+      return x1 + x2;
+    }
+
+
+    function handleChangeQuantity (appendAmount) {
+      let currentTotal = parseInt($('.shoping__checkout span').html().replace(/[\.đ]/g, ''));
+      currentTotal += appendAmount;
+      $('.shoping__checkout span').html(`${formatNumber(currentTotal)}đ`);
+    }
+
+    $(".go-to-checkout-btn").click(function (e) {
+      e.preventDefault();
+      const data = []
+      for (item of $('.product-id-hidden')){
+        data.push({
+          product_id: item.value,
+          product_model_id: $(item).data('model-id'),
+          quantity: item.parentElement.parentElement.querySelector(".quantity input").value,
+        })
+      }
+
+      const url = `/${window.location.pathname.split("/")[1]}/update-product-to-cart`;
+      $.ajax({
+        url,
+        type: "POST",
+        headers: {
+          "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val(),
+        },
+        dataType: "json",
+        processData: false,
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(data),
+        success: function (data) {
+          if (data.success) {
+            window.location = "{% url 'user.checkout' %}"
+          }
+        },
+      });
+    });
+
+    $('.delete-product-cart').click(function () {
+      data = {
+        product_id: $(this).parent().parent().find('input[type="hidden"]').val(),
+        quantity: 0
+      }
+
+      const url = `/${window.location.pathname.split("/")[1]}/delete-product-to-cart`;
+      $.ajax({
+        url,
+        type: "DELETE",
+        headers: {
+          "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val(),
+        },
+        dataType: "json",
+        processData: false,
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(data),
+        success: function (data) {
+          if (data.success) {
+            window.location.reload()
+          }
+        },
+      });
+    })
+    
+  })
+</script>
+{% endblock script %}

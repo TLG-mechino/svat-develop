@@ -1,0 +1,87 @@
+{% load static %}
+{% load i18n %} 
+
+<div class="header__top">
+  <div class="container">
+    <div class="row">
+      <div class="col-6">
+        <div class="header__top__left">
+        <ul>
+        <li><i class="fa fa-envelope"></i> Duckhuong2010@gmail.com</li>
+        </ul>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="header__top__right">
+          <div class="header__top__right__social">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+            <a href="#"><i class="fa fa-pinterest-p"></i></a>
+          </div>
+          <div class="header__top__right__language">
+            <img id="current-lang-img" src="data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAABwAwCdASobAA4APm0skkWkIqGYBABABsSxAE6ADcGtd+FD6qAA/vV+Wp4VqyJwr3tsqzUVysGAxh5jK++StlIxrHdqkxyfiwYlcgHy6RWg//tsvaTR2IctDJnOE/5mY93zrj0P0ea+n9DmVodGk7RubcK/qHhB4yLFEzBhQuGAAA==" alt="">
+            <div id="current-lang-text">English</div>
+            <ul>
+              <li id="vi_choice">Vietnamese</li>
+              <li id="en_choice">English</li>
+            </ul>
+          </div>
+          <div class="header__top__right__auth">
+            {% if user.name %}
+              <i class="fa fa-user"></i>
+              <div>{{ user.name }}</div>
+              <ul>
+                <li><a href="{% url 'user.view_profile' %}">{% trans "user-infomation" %}</a></li>
+                <li><a href="{% url 'user.view_orders' %}">{% trans "user-order" %}</a></li>
+                <li><a href="{% url 'user.logout' %}">{% trans "user-exits" %}</a></li>
+              </ul>
+            {% else %}
+              <a href="{% url 'user.login' %}"><i class="fa fa-user"></i> {% trans "login" %}</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block script %}
+
+  <script>
+      let englishFlagImg = 'data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAABwAwCdASobAA4APm0skkWkIqGYBABABsSxAE6ADcGtd+FD6qAA/vV+Wp4VqyJwr3tsqzUVysGAxh5jK++StlIxrHdqkxyfiwYlcgHy6RWg//tsvaTR2IctDJnOE/5mY93zrj0P0ea+n9DmVodGk7RubcK/qHhB4yLFEzBhQuGAAA=='
+      let vietnameseFlagImg = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgNjAwIj4NCjxwYXRoIGZpbGw9IiNkYTI1MWQiIGQ9Im0wLDBoOTAwdjYwMGgtOTAweiIvPg0KPHBhdGggZmlsbD0iI2ZmMCIgZD0ibTQ5NC44NSwyMzcuNTEyaDE0NS4xNWwtMTE3LjQyLDg0Ljk4NSA0NC44NSwxMzcuNTAzLTExNy40My04NC45ODQtMTE3LjQzLDg0Ljk4NCA0NC44Ni0xMzcuNTAzLTExNy40My04NC45ODVoMTQ1LjE1bDQ0Ljg1LTEzNy41MTIgNDQuODUsMTM3LjUxMnoiLz4NCjwvc3ZnPg0K'
+
+      let currentLangText = document.getElementById('current-lang-text')
+      let currentLangImg = document.getElementById('current-lang-img')
+
+      let langCode = window.location.pathname.split('/')[1]
+      if (langCode === 'vi'){
+        currentLangText.innerText = 'Việt Nam'
+        currentLangImg.src = vietnameseFlagImg
+      }
+      else{
+        currentLangText.innerText = 'English'
+        currentLangImg.src = englishFlagImg
+      }
+
+      let viChoice = document.getElementById('vi_choice')
+      let enChoice = document.getElementById('en_choice')
+
+      viChoice.addEventListener('click', function(){
+        let currentPath = window.location.pathname.split('/')
+        currentPath[1] = "vi"
+        let newPath = currentPath.join('/')
+        window.location.href = window.location.origin + newPath + window.location.search
+      })
+
+      enChoice.addEventListener('click', function(){
+        let currentPath = window.location.pathname.split('/')
+        currentPath[1] = "en"
+        let newPath = currentPath.join('/')
+        window.location.href = window.location.origin + newPath + window.location.search
+      })
+
+  </script>
+
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends 'user/layout/base.html' %} 
+{% load static %}
+{% load humanize %}
+{% load i18n %}
+
+
+{% block title %}Hóa đơn{% endblock title %}
+
+{% block css %}
+<style>
+input {
+  color: #000 !important
+}
+</style>
+{% endblock css %}
+
+{% block content %}
+<!-- breadcrumb -->
+<section class="breadcrumb-section set-bg" data-setbg="{% static 'user/global/images/bg-breadcrumb.png' %}"
+    style="background-image: url(&quot;{% static 'user/global/images/bg-breadcrumb.png' %}&quot;);">
+    <div class="container h-100">
+        <div class="text-center h-100">
+            <div class="breadcrumb__text h-100 text-white d-flex justify-content-center align-items-center">
+                <h2>{% trans "checkout-title" %}</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="checkout spad ">
+  <div class="container-fluid w-75 ">
+      <h4 class="font-weight-bold">{% trans "checkout-order-info" %}</h4>
+      <form class="bg-white p-3" action="#" id="order-form">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-lg-8 col-md-6">
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="checkout__input">
+                  <p>{% trans "checkout-name" %}<span>*</span></p>
+                  <input type="text" name="name" placeholder="{% trans "checkout-name" %}" {% if request.user.is_authenticated %}value="{{request.user.name}}"{% endif %}/>
+                </div>
+              </div>
+            </div>
+            <div class="checkout__input">
+              <p>{% trans "checkout-address" %}<span>*</span></p>
+              <input
+                type="text"
+                placeholder="{% trans "checkout-address" %}"
+                name="address"
+                {% if request.user.is_authenticated %}value="{{request.user.address}}"{% endif %}
+              />
+            </div>
+            
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="checkout__input">
+                  <p>Email<span></span></p>
+                  <input type="text" name="email" placeholder="Email" {% if request.user.is_authenticated %}value="{{request.user.email}}"{% endif %}/>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="checkout__input">
+                  <p>{% trans "checkout-phone-number" %}<span>*</span></p>
+                  <input type="text" name="phone-number" placeholder="{% trans "checkout-phone-number" %}" {% if request.user.is_authenticated %}value="{{request.user.phone_number}}"{% endif %}/>
+                </div>
+              </div>
+            </div>
+            {% if False %}
+            <div class="checkout__input__checkbox">
+              <label for="acc">
+                {% trans "checkout-create-acc-01" %}
+                <input type="checkbox" id="acc" name="acc"/>
+                <span class="checkmark"></span>
+              </label>
+            </div>
+            <p>
+              {% trans "checkout-create-acc-02" %}
+            </p>
+            <div class=" group-password d-none">
+              <div class="row">
+                <div class="col-6 checkout__input">
+                  <p>{% trans "checkout-password" %}<span>*</span></p>
+                  <input type="password" name="password" id="password" placeholder="{% trans "checkout-password" %}"/>
+                </div>
+                <div class="col-6 checkout__input">
+                  <p>{% trans "checkout-re-password" %}<span>*</span></p>
+                  <input type="text" name="re-password" placeholder="{% trans "checkout-re-password" %}"/>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="checkout__input">
+              <p>{% trans "checkout-note" %}<span></span></p>
+              <input
+                type="text"
+                placeholder="{% trans "checkout-placeholder-note" %}"
+                name="note"
+              />
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6">
+            <h4 class="font-weight-bold">{% trans "checkout-order" %}</h4>
+            <div class="checkout__order">
+              <div class="checkout__order__products">
+                {% trans "checkout-product" %} <span>{% trans "checkout-total" %}</span>
+              </div>
+              <ul class="p-0">
+                {% for product in products %}
+                <li class="checkout-product text-truncate">
+                  <input type="hidden" name="id" value="{{product.product.id}}" data-model-id="{{product.product_model.id}}"/>
+                  <div class="w-100 m--1">
+                  {% if request.LANGUAGE_CODE == "vi" %}
+                    {{ product.product.product_language_vi.name }}
+                  {% else %} 
+                    {{ product.product.product_language_en.name }}
+                  {% endif %}
+                  </div>
+
+                  {% widthratio product.product_model.price 1 product.quantity as total_value %} 
+                  <b class="quantity-element" data-quantity={{product.quantity}}>x{{product.quantity}}</b>
+                  <span>{{ total_value | intcomma }}đ</span>
+                </li>
+                <hr>
+                {% endfor %}
+              </ul>
+              <div class="checkout__order__total">
+                {% trans "checkout-total" %}<span>{{total}}đ</span>
+              </div>
+              
+              <button type="submit" class="site-btn">{% trans "checkout-proceed-checkout" %}</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock content%}
+{% block script %}
+<!-- jquery-validation -->
+<script src="{% static 'admin-lte/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'admin-lte/plugins/jquery-validation/additional-methods.min.js' %}"></script>
+
+<script>
+
+$(document).ready(function() {
+
+  $('#order-form').submit(function(e){
+    e.preventDefault();
+  })
+
+  jQuery.validator.addMethod("phone_number", function(value, element) {
+    return value.match(/^0\d{9,10}$/)
+  }, '{% trans "phone-number-validate" %}');
+
+  jQuery.validator.addMethod("password_rule", function(value, element) {
+    return !$('#acc').is(":checked") || value.match(/^[\w\d]{8,256}$/)
+  },  '{% trans "password-validate" %}');
+
+  $("#order-form").validate({
+      ignore: [],
+      debug: false,
+      rules: {
+        "name": { required: true, },
+        "address": { required: true, },
+        "phone-number": { required: true, phone_number: true }, 
+        'password': { required:'#acc:checked', password_rule: true },
+        're-password': { required:'#acc:checked', equalTo: "#password" }
+      },
+      messages: {
+        "name": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "name" %}'),
+        },
+        "email": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "email" %}'),
+          email: '{% trans "email-validate" %}',
+        },
+        "phone-number": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "phone-number" %}'),
+        },
+        "password": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "password" %}'),
+        },
+        "re-password":{
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "re-password" %}'),
+          equalTo : '{% trans "re-password-validate" %}'
+        },
+        "address": {
+          required: '{% trans "required-validate" %}'.replace('{}', '{% trans "address" %}'),
+        }
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.checkout__input').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      },
+      submitHandler: function(form) {
+        // call ajax
+        let data = getData();
+        let url = `/${window.location.pathname.split('/')[1]}/checkout`;
+        $.ajax({
+          url,
+          type: "POST",
+          headers: {
+            "X-CSRFTOKEN": $("[name=csrfmiddlewaretoken]").val()
+          },
+          dataType: 'json',
+          processData: false,
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify(data),
+          success: function(data) {
+            if (data.success) {
+              let url = `/${window.location.pathname.split('/')[1]}/user/orders`
+              {% if not request.user.is_authenticated %} 
+                toastr.success("Đặt hàng thành công, nhân viên bán hàng sẽ liên lạc tới quý khách theo số điện thoại đã cung cấp")
+                url = `/${window.location.pathname.split('/')[1]}/`
+                setTimeout(() => {window.location = url}, 5000)
+                return;
+              {% endif %}
+              window.location = url
+            } else {
+              toastr.error("Lỗi bất ngờ")
+            }
+          }
+        })
+      }
+  })
+
+  function getData () {
+    let result = {};
+    result['name'] = $('[name="name"]').val()
+    result['email'] = $('[name="email"]').val() 
+    result['address'] = $('[name="address"]').val()
+    result['phone_number'] = $('[name="phone-number"]').val()
+    result['note'] = $('[name="note"]').val()
+
+    let products = [];
+    $(".checkout-product").each(function () {
+      let product = {};
+      product['id'] = $(this).find('[name="id"]').val()
+      product['product_model_id'] = $(this).find('[name="id"]').data("model-id")
+      product['quantity'] = $(this).find('.quantity-element').data('quantity')
+      products.push(product);
+    })
+    result['products'] = products;
+    if ($('#acc').is(":checked")) {
+      result['password'] = $('[name="password"]').val()
+    }
+    return result;
+  }
+
+  $('#acc').change(function() {
+    if(this.checked) {
+      $('.group-password').removeClass('d-none')
+    } else {
+      $('.group-password').addClass('d-none')
+    }
+  })
+})
+</script>
+{% endblock script %}
+
