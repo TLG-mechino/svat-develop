@@ -30,11 +30,12 @@ def index(request):
     total_product = len(Product.objects.all())
     total_user = len(User.objects.all())
     total_feed_back = len(Message.objects.all())
-    list_category = Product.objects.all().values('product_category__name_vi', 'product_category_id').annotate(total=Count('product_category_id'))
+    list_category = Product.objects.all().values('product_category__name_vi', 'product_category_id').annotate(
+        total=Count('product_category_id'))
     context = {
-        "total_order": total_order, 
-        "total_product": total_product, 
-        "total_user": total_user, 
+        "total_order": total_order,
+        "total_product": total_product,
+        "total_user": total_user,
         "total_feed_back": total_feed_back,
         "list_category": list_category
     }
@@ -72,7 +73,6 @@ def handle_logout(request):
 
 def handle403(request):
     return render(request, 'pages/403.html')
-
 
 
 def paginate(params, Model, values, initial_query=Q(), search_fields=[], order_fields=[]):
@@ -214,13 +214,13 @@ def delete_user(request):
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 # Product category below
 def product_category(request):
-    return render(request,"pages/product_category.html")
+    return render(request, "pages/product_category.html")
 
 
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def get_all_product_category(request):
     if request.method == 'GET':
-        product_categories = list(ProductCategory.objects.all().values('id', 'name_en','name_vi'))
+        product_categories = list(ProductCategory.objects.all().values('id', 'name_en', 'name_vi'))
         data = {
             "data": product_categories,
         }
@@ -265,8 +265,8 @@ def update_product_category(request):
     if request.method == "POST":
         product_category = json.loads(request.body)
         product_category_in_db = ProductCategory.objects.get(id=product_category['id'])
-        product_category_in_db.name_en=product_category['name_en']
-        product_category_in_db.name_vi=product_category['name_vi']
+        product_category_in_db.name_en = product_category['name_en']
+        product_category_in_db.name_vi = product_category['name_vi']
         try:
             product_category_in_db.save()
             data = {
@@ -288,7 +288,7 @@ def delete_product_category(request):
     if request.method == "POST":
         product_category = json.loads(request.body)
         try:
-            u=ProductCategory.objects.filter(id = product_category['id']).delete()
+            u = ProductCategory.objects.filter(id=product_category['id']).delete()
             data = {
                 "success": True,
                 "msg": ""
@@ -306,13 +306,13 @@ def delete_product_category(request):
 # Article category below
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def article_category(request):
-    return render(request,"pages/article_category.html")
+    return render(request, "pages/article_category.html")
 
 
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def get_all_article_category(request):
     if request.method == 'GET':
-        article_categories = list(ArticleCategory.objects.all().values('id', 'name_en','name_vi'))
+        article_categories = list(ArticleCategory.objects.all().values('id', 'name_en', 'name_vi'))
         data = {
             "data": article_categories,
         }
@@ -356,8 +356,8 @@ def update_article_category(request):
     if request.method == "POST":
         article_category = json.loads(request.body)
         article_category_in_db = ArticleCategory.objects.get(id=article_category['id'])
-        article_category_in_db.name_en=article_category['name_en']
-        article_category_in_db.name_vi=article_category['name_vi']
+        article_category_in_db.name_en = article_category['name_en']
+        article_category_in_db.name_vi = article_category['name_vi']
         try:
             article_category_in_db.save()
             data = {
@@ -379,7 +379,7 @@ def delete_article_category(request):
     if request.method == "POST":
         article_category = json.loads(request.body)
         try:
-            ArticleCategory.objects.filter(id = article_category['id']).delete()
+            ArticleCategory.objects.filter(id=article_category['id']).delete()
             data = {
                 "success": True,
                 "msg": ""
@@ -403,15 +403,16 @@ def get_articles(request):
     data = paginate(request.GET, Article, values, initial_query, search_fields, order_fields)
     return JsonResponse(data, safe=False)
 
+
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
 # Article below
-def article_index (request):
+def article_index(request):
     articles = Article.objects.all().order_by('-id')[:20]
     return render(request, 'pages/article/index.html', {"articles": articles})
 
 
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
-def article_store (request):
+def article_store(request):
     form_vi = ArticleForm(prefix="vi")
     form_en = ArticleForm(prefix="en")
     article_category = ArticleCategory.objects.all()
@@ -425,7 +426,7 @@ def article_store (request):
 
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
 @transaction.atomic
-def article_post_store (request):
+def article_post_store(request):
     if request.method == "POST":
         data = json.loads(request.body)
         en_lang = Language.objects.filter(code='en').first()
@@ -466,6 +467,7 @@ def article_post_store (request):
             "message": "Method not supported"
         })
 
+
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
 def uploads(request):
     if 'file[0]' in request.FILES:
@@ -489,9 +491,10 @@ def uploads(request):
             "name": os.path.join('uploads', file_name)
         })
 
+
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
 @transaction.atomic
-def article_edit (request, id):
+def article_edit(request, id):
     article = Article.objects.filter(pk=id).first()
     if article is None:
         raise Http404("Article does not exist")
@@ -525,7 +528,7 @@ def article_edit (request, id):
 
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
 @transaction.atomic
-def article_post_edit (request):
+def article_post_edit(request):
     if request.method == "POST":
         data = json.loads(request.body)
         en_lang = Language.objects.filter(code='en').first()
@@ -583,6 +586,7 @@ def get_products(request):
 
     return JsonResponse(data, safe=False)
 
+
 @user_passes_test(PERMISSIONS.admin_congtacvienvietbai, login_url='admin.403')
 def product_index(request):
     if not request.user.is_authenticated:
@@ -614,7 +618,6 @@ def product_post_store(request):
         data = json.loads(request.body)
         en_lang = Language.objects.filter(code='en').first()
         vi_lang = Language.objects.filter(code='vi').first()
-
 
         # Save product
         product = Product()
@@ -731,14 +734,12 @@ def product_post_edit(request):
             else:
                 data['images'].remove(image.media.file_path)
 
-
         for image in data['images']:
             # Save product's images
             media = Media(file_path=image)
             media.save()
             product_image = ProductImage(media=media, product=product)
             product_image.save()
-
 
         ProductModel.objects.filter(product=product).delete()
         for model in models:
@@ -792,7 +793,7 @@ def update_order(request):
             # Neu huy => return lai quantity
             if status == 4:
                 order_products = order.order_product()
-                for order_product in order_products :
+                for order_product in order_products:
                     product_model = order_product.product_model
                     product_model.quantity += order_product.quantity
                     product_model.save()
@@ -829,8 +830,10 @@ def get_all_order(request):
 def get_detail_order(request):
     if request.method == 'POST':
         order_id = json.loads(request.body)['id']
-        order = Order.objects.filter(pk=order_id).values('id', 'name', 'address', 'email', 'phone_number', 'shipping_fee', 'total', 'total_products', 'status').first()
-        detail_orders = list(OrderProduct.objects.filter(order=order_id).values('id', 'quantity', 'product_model').all())
+        order = Order.objects.filter(pk=order_id).values('id', 'name', 'address', 'email', 'phone_number',
+                                                         'shipping_fee', 'total', 'total_products', 'status').first()
+        detail_orders = list(
+            OrderProduct.objects.filter(order=order_id).values('id', 'quantity', 'product_model').all())
         data = {
             "order": order,
             "detail_orders": []
@@ -850,20 +853,20 @@ def get_detail_order(request):
         return JsonResponse(data, safe=False)
 
 
-#Import Order
+# Import Order
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def import_order(request):
     products = list(Product.objects.all().values('id'))
-    return render(request,"pages/import_order.html",{"len":len(products)})
+    return render(request, "pages/import_order.html", {"len": len(products)})
 
 
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def get_all_import_order(request):
     if request.method == 'GET':
-        import_orders = list(ImportOrder.objects.all().values('id', 'created','user'))
-        for i in range(0,len(import_orders)):
-            user_mail=User.objects.get(id=import_orders[i]['user']).email
-            id=import_orders[i]['user']=user_mail
+        import_orders = list(ImportOrder.objects.all().values('id', 'created', 'user'))
+        for i in range(0, len(import_orders)):
+            user_mail = User.objects.get(id=import_orders[i]['user']).email
+            id = import_orders[i]['user'] = user_mail
         data = {
             "data": import_orders,
         }
@@ -884,27 +887,30 @@ def order_index(request):
 def view_detail(request):
     if request.method == "POST":
         req = json.loads(request.body)
-        import_order_products = ImportOrder.objects.filter(pk=req['id']).first().importorderproduct_set.values('quantity', 'id', 'product_model').all()
+        import_order_products = ImportOrder.objects.filter(pk=req['id']).first().importorderproduct_set.values(
+            'quantity', 'id', 'product_model').all()
         info = ImportOrder.objects.values('id', 'created').get(pk=req['id'])
 
         result = []
         for import_product in import_order_products:
-            product_model = ProductModel.objects.values('product', 'weight', 'price').get(pk=import_product['product_model'])
+            product_model = ProductModel.objects.values('product', 'weight', 'price').get(
+                pk=import_product['product_model'])
             product = Product.objects.get(pk=product_model['product'])
             tmp = {
                 'quantity': import_product['quantity'],
                 'weight': product_model['weight'],
                 'price': product_model['price'],
-                'name': f'#{product.id} - {product.product_language_vi().name}' 
+                'name': f'#{product.id} - {product.product_language_vi().name}'
             }
             result.append(tmp)
 
-        data={
+        data = {
             'data': result,
             'info': info,
-            'success':True
+            'success': True
         }
         return JsonResponse(data)
+
 
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def store_import_order(request):
@@ -918,7 +924,7 @@ def store_import_order(request):
             return JsonResponse(result)
 
         # import order
-        newImportOrder=ImportOrder(created=datetime.now(), user=request.user)
+        newImportOrder = ImportOrder(created=datetime.now(), user=request.user)
         newImportOrder.save()
 
         for item in data:
@@ -928,7 +934,8 @@ def store_import_order(request):
             product_model.save()
 
             # import product
-            import_order_product = ImportOrderProduct(quantity=item['quantity'], import_order=newImportOrder, product_model=product_model)
+            import_order_product = ImportOrderProduct(quantity=item['quantity'], import_order=newImportOrder,
+                                                      product_model=product_model)
             import_order_product.save()
 
         return JsonResponse(result)
@@ -936,6 +943,7 @@ def store_import_order(request):
         "success": False,
         "message": "Lỗi bất ngờ"
     })
+
 
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def get_all_product(request):
@@ -946,7 +954,8 @@ def get_all_product(request):
             tmp = {
                 'id': product.pk,
                 'text': f"#{product.pk} - {product.product_language_vi().name}",
-                'models': json.dumps(list(product.product_model.values('id', 'weight', 'quantity').all()), cls=DjangoJSONEncoder)
+                'models': json.dumps(list(product.product_model.values('id', 'weight', 'quantity').all()),
+                                     cls=DjangoJSONEncoder)
             }
             result.append(tmp)
 
@@ -955,10 +964,12 @@ def get_all_product(request):
         }
         return JsonResponse(data, safe=False)
 
+
 # Message
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def message(request):
     return render(request, 'pages/message.html')
+
 
 @user_passes_test(PERMISSIONS.admin_quanly, login_url='admin.403')
 def get_all_message(request):
@@ -974,12 +985,12 @@ def get_all_message(request):
 def process_message(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        id_message=int(data['id'])
-        message=Message.objects.get(id=id_message)
-        message.status=1
+        id_message = int(data['id'])
+        message = Message.objects.get(id=id_message)
+        message.status = 1
         message.save()
-        data={
-            "success":True,
+        data = {
+            "success": True,
         }
         return JsonResponse({
             "success": True,
@@ -998,12 +1009,12 @@ def get_message_in_progress(request):
         return JsonResponse({
             'success': False,
             'total': 0
-        }) 
+        })
 
 
-def get_order_in_progress (request):
+def get_order_in_progress(request):
     if request.user.is_authenticated and (request.user.role == 12 or request.user.role == 10):
-        orders = Order.objects.filter(status__in=[0,1,2])
+        orders = Order.objects.filter(status__in=[0, 1, 2])
         return JsonResponse({
             'success': True,
             'total': len(orders)
@@ -1015,7 +1026,7 @@ def get_order_in_progress (request):
         })
 
 
-def send_email_order_in_progress (request):
+def send_email_order_in_progress(request):
     if request.method == "POST":
         data = json.loads(request.body)
         order_id = data['order_id']
@@ -1023,9 +1034,9 @@ def send_email_order_in_progress (request):
         order.shipping_fee = data['shipping_fee']
         order.total = int(order.total_products) + int(data['shipping_fee'])
         order.save()
-        
+
         subject = '[SVAT] Xác nhận đơn hàng'
-        msg_html = render_to_string('user/pages/checkout/checkout-email-form.html', { 'order': order })
+        msg_html = render_to_string('user/pages/checkout/checkout-email-form.html', {'order': order})
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [order.email]
         send_mail(subject, msg_html, email_from, recipient_list, html_message=msg_html)
