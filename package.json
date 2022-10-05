@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/tienanhnguyen191999/svat#readme",
   "dependencies": {
-    "admin-lte": "^3.1.0",
+    "admin-lte": "3.0",
     "ckeditor4": "^4.16.0",
     "datatables.net": "^1.10.24",
     "datatables.net-dt": "^1.10.24",

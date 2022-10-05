@@ -64,17 +64,17 @@
 <section class="hero" style="margin-bottom: 30px;">
   <div style="position: relative">
     <a href="{% url 'user.product.list' %}" >
-      <img class="w-100" style="height: 400px" src="{% static 'user/global/images/main-banner.jpg' %}">
+      <img class="w-100" style="width: 100%; height: 400px" src="{% static 'user/global/images/main-banner.jpg' %}">
     </a>
   </div>
 </section>
 <div class="container-fluid w-80 p-0 bg-white">
 <div class="row">
-  <div class="col-3">
+  <div class="col-sm-3">
     {% include 'user/components/sidebar.html' with categories=product_categories showArticles=True %}
   </div>
 
-  <div class="col-9">
+  <div class="col-sm-9">
     <section class="featured spad pb-0">
       <div class="row w-100">
         <div class="">
